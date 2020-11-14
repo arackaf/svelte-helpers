@@ -12,10 +12,10 @@ This library contains some helpers I've found useful for working with Svelte. Ri
 
 ## Animation
 
-`svelte-helpers/animation` has some functions that will help you use spring animations in an enter or exit transition. 
+`svelte-helpers/spring-transitions` has some functions that will help you use spring animations in an enter or exit transition. 
 
 ```js
-import { springIn, springOut } from "svelte-helpers/animation";
+import { springIn, springOut } from "svelte-helpers/spring-transitions";
 ```
 
 Both of these functions accept from and to values, as well as spring configuration, and return a duration value, and a function to pass your "tick" value to, to get the currently animated value, for use in a svelte transition's `css` function. An example should make this much clearer.
