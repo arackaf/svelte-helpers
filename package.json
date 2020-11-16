@@ -1,10 +1,11 @@
 {
   "name": "svelte-helpers",
-  "version": "0.0.1-beta11",
+  "version": "0.0.1-beta14",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "prepublishOnly": "rollup -c"
   },
   "repository": {
     "type": "git",
