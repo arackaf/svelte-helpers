@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/arackaf/svelte-helpers/issues"
   },
-  "homepage": "https://github.com/arackaf/svelte-helpers#readme"
+  "homepage": "https://github.com/arackaf/svelte-helpers#readme",
+  "devDependencies": {
+    "rollup": "^2.33.2",
+    "rollup-plugin-svelte": "^6.1.1"
+  }
 }

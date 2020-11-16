@@ -12,16 +12,16 @@ const springToTickValue = (frames, out = false) => t => {
   return indexExcess ? a + (b - a) * indexExcess : a;
 };
 
-function springIn(from, to, springOptions){
+export function springIn(from, to, springOptions){
   return springToTransition(false, from, to, springOptions);
 }
 
-function springOut(from, to, springOptions){
+export function springOut(from, to, springOptions){
   return springToTransition(true, from, to, springOptions);
 }
 
 function springToTransition(out, from, to, springOptions) {
-  const frames = springFrames(from, to, springOptions);
+  const frames = springFrames(from, to, springOptions)
   return {
     duration: (frames.length * 1000) / 60,
     tickToValue: springToTickValue(frames, out),
@@ -32,7 +32,7 @@ function is_date(obj) {
 	return Object.prototype.toString.call(obj) === '[object Date]';
 }
 
-function springFrames(from, to, opts) {
+export function springFrames(from, to, opts) {
   opts = Object.assign({}, DEFAULTS, opts);
 
   let value = from;
@@ -84,5 +84,3 @@ function tick_spring(ctx, last_value, current_value, target_value) {
     throw new Error(`Cannot spring ${typeof current_value} values`);
   }
 }
-
-export { springFrames, springIn, springOut };
