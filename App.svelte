@@ -1,5 +1,5 @@
 <script>
-  import AutoComplete from "./src/AutoComplete.svelte";
+  import AutoSuggest from "./src/AutoSuggest.svelte";
 
   let options = [
     { name: "Adam" },
@@ -16,6 +16,6 @@
   }
 </style>
 
-<AutoComplete placeholder="Search" {options}>
+<AutoSuggest placeholder="Search" {options}>
   <div let:option slot="result">{option.name}</div>
-</AutoComplete>
+</AutoSuggest>
