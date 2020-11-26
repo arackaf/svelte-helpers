@@ -1,15 +1,26 @@
 <script>
-  import { fade } from "svelte/transition";
+  import { fade, slide } from "svelte/transition";
   let open = false;
 
   let currentSearch = "";
   export let options = [];
   export let placeholder = "";
+  export let filterField = "";
+  let filteredOptions = options;
 
-  function onBlur(){ 
+  function onBlur() {
     open = false;
     currentSearch = "";
   }
+
+  function filterOptions() {
+    return options.filter(item => new RegExp(currentSearch, "i").test(item[filterField]));
+  }
+  $: {
+    filteredOptions = currentSearch ? filterOptions() : options;
+  }
+
+  const test = () => void 0;
 </script>
 
 <style>
@@ -47,6 +58,8 @@
     position: absolute;
     left: calc(-1 * var(--svelte-helpers-auto-complete-container-offset-for-border-radius));
     top: -1px;
+    max-height: 200px;
+    overflow: hidden;
   }
 
   ul {
@@ -61,7 +74,7 @@
     margin: 0;
   }
 
-  li:hover {
+  li.result:hover {
     background-color: var(--svelte-helpers-auto-complete-item-hover-background);
     cursor: var(--svelte-helpers-auto-complete-item-hover-cursor);
   }
@@ -73,9 +86,13 @@
     <div transition:fade={{ duration: 150 }} class="items-root">
       <div class="items-container">
         <ul>
-          {#each options as option}
-            <li>
+          {#each filteredOptions as option (option.name)}
+            <li class="result">
               <slot name="result" {option}>Hello World FOO Hello World Hello World Hello World Hello World</slot>
+            </li>
+          {:else}
+            <li>
+              <slot name="no-results">No results</slot>
             </li>
           {/each}
         </ul>

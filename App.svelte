@@ -6,7 +6,13 @@
     { name: "Laura" },
     { name: "Mark" },
     { name: "Rob" },
-    { name: "Jen" }
+    { name: "Jen" },
+    { name: "James" },
+    { name: "Jason" },
+    { name: "Kevin" },
+    { name: "Katie" },
+    { name: "Mallory" },
+    { name: "David" }
   ];
 </script>
 
@@ -16,6 +22,9 @@
   }
 </style>
 
-<AutoSuggest placeholder="Search" {options}>
-  <div let:option slot="result">{option.name}</div>
-</AutoSuggest>
+<div style="margin: 100px">
+  <AutoSuggest filterField={'name'} placeholder="Search" {options}>
+    <div slot="result" let:option>{option.name}</div>
+    <span slot="no-results" style="color: blue">No Results, yo</span>
+  </AutoSuggest>
+</div>
