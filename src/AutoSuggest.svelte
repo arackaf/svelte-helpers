@@ -1,4 +1,5 @@
 <script>
+  import escapeRegex from "escape-string-regexp";
   import { spring } from "svelte/motion";
   import { fade, slide } from "svelte/transition";
   let open = false;
@@ -11,11 +12,10 @@
 
   function onBlur() {
     open = false;
-    currentSearch = "";
   }
 
   function filterOptions() {
-    return options.filter(item => new RegExp(currentSearch, "i").test(item[filterField]));
+    return options.filter(item => new RegExp(escapeRegex(currentSearch), "i").test(item[filterField]));
   }
 
   $: {
@@ -23,7 +23,7 @@
   }
 
   let animateContainerHeight = false;
-  const slideInSpring = spring(0, { stiffness: 0.1, damping: 0.2 });
+  const slideInSpring = spring(0, { stiffness: 0.2, damping: 0.7 });
 
   function setSpringHeight(height, hard) {
     let maxHeightVar = getComputedStyle(document.documentElement).getPropertyValue("--svelte-helpers-auto-complete-results-max-height");
@@ -45,7 +45,7 @@
     itemsHeightObserver.observe(resultsList);
   }
   function closing() {
-    itemsHeightObserver.unobserve(resultsList)
+    itemsHeightObserver.unobserve(resultsList);
     animateContainerHeight = false;
   }
   function closed() {}
@@ -57,7 +57,7 @@
     --svelte-helpers-auto-complete-border-width: 1px;
     --svelte-helpers-auto-complete-border-radius: 4px;
     --svelte-helpers-auto-complete-item-padding: 5px;
-    --svelte-helpers-auto-complete-results-max-height: 200px;
+    --svelte-helpers-auto-complete-results-max-height: 300px;
     --svelte-helpers-auto-complete-item-hover-background: lightgray;
     --svelte-helpers-auto-complete-item-hover-cursor: pointer;
   }
@@ -92,7 +92,7 @@
     position: absolute;
     left: 0;
     top: calc(-1 * var(--svelte-helpers-auto-complete-border-width));
-    max-height: 200px;
+    max-height: calc(var(--svelte-helpers-auto-complete-border-width) + 10);
     overflow: auto;
   }
 
