@@ -23,7 +23,7 @@
 </style>
 
 <div style="margin: 100px">
-  <AutoSuggest filterField={'name'} placeholder="Search" {options}>
+  <AutoSuggest filterField={'name'} displayField="name" placeholder="Search" {options}>
     <div slot="result" let:option>{option.name}</div>
     <span slot="no-results" style="color: blue">No Results, yo</span>
   </AutoSuggest>

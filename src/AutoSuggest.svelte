@@ -4,14 +4,22 @@
   import { fade, slide } from "svelte/transition";
   let open = false;
 
-  let currentSearch = "";
   export let options = [];
   export let placeholder = "";
   export let filterField = "";
+  export let displayField = "";
+
+  let inputEl = null;
+  let currentSearch = "";
   let filteredOptions = options;
+  let selectedIndex = null;
 
   function onBlur() {
     open = false;
+  }
+
+  function onFocus() {
+    open = true;
   }
 
   function filterOptions() {
@@ -20,6 +28,15 @@
 
   $: {
     filteredOptions = currentSearch ? filterOptions() : options;
+    selectedIndex = null;
+  }
+
+  $: {
+    if (resultsList && selectedIndex != null) {
+      let allListItems = [...resultsList.querySelectorAll("li")];
+      let li = allListItems[selectedIndex];
+      li && li.scrollIntoView({ block: "nearest" });
+    }
   }
 
   let animateContainerHeight = false;
@@ -49,6 +66,41 @@
     animateContainerHeight = false;
   }
   function closed() {}
+
+  function highlightItem(index) {
+    index !== selectedIndex && (selectedIndex = index);
+  }
+  function unhighlightItem(index) {
+    if (selectedIndex === index) {
+      selectedIndex = null;
+    }
+  }
+
+  function onSelect(option) {
+    if (typeof option === "string") {
+      inputEl.value = option;
+    } else {
+      inputEl.value = option[displayField];
+    }
+  }
+
+  function keyDown(evt) {
+    if (open && filteredOptions.length) {
+      if (evt.keyCode == 40) {
+        if (selectedIndex == null) {
+          selectedIndex = 0;
+        } else {
+          selectedIndex = selectedIndex == filteredOptions.length - 1 ? 0 : selectedIndex + 1;
+        }
+      } else if (evt.keyCode == 38) {
+        if (selectedIndex == null) {
+          selectedIndex = filteredOptions.length - 1;
+        } else {
+          selectedIndex = selectedIndex == 0 ? filteredOptions.length - 1 : selectedIndex - 1;
+        }
+      }
+    }
+  }
 </script>
 
 <style>
@@ -57,7 +109,7 @@
     --svelte-helpers-auto-complete-border-width: 1px;
     --svelte-helpers-auto-complete-border-radius: 4px;
     --svelte-helpers-auto-complete-item-padding: 5px;
-    --svelte-helpers-auto-complete-results-max-height: 300px;
+    --svelte-helpers-auto-complete-results-max-height: 200px;
     --svelte-helpers-auto-complete-item-hover-background: lightgray;
     --svelte-helpers-auto-complete-item-hover-cursor: pointer;
   }
@@ -92,7 +144,7 @@
     position: absolute;
     left: 0;
     top: calc(-1 * var(--svelte-helpers-auto-complete-border-width));
-    max-height: calc(var(--svelte-helpers-auto-complete-border-width) + 10);
+    max-height: var(--svelte-helpers-auto-complete-results-max-height);
     overflow: auto;
   }
 
@@ -108,16 +160,20 @@
     margin: 0;
   }
 
-  li.result:hover {
-    background-color: var(--svelte-helpers-auto-complete-item-hover-background);
+  :global(li.result) {
     cursor: var(--svelte-helpers-auto-complete-item-hover-cursor);
+  }
+
+  :global(li.selected) {
+    background-color: var(--svelte-helpers-auto-complete-item-hover-background);
   }
 </style>
 
+<svelte:window on:keydown={keyDown} />
 <h1>{$slideInSpring}</h1>
 
 <div class="root" class:open>
-  <input {placeholder} bind:value={currentSearch} on:focus={() => (open = true)} on:blur={onBlur} class:open />
+  <input {placeholder} bind:this={inputEl} bind:value={currentSearch} on:focus={onFocus} on:blur={onBlur} class:open />
   {#if open}
     <div
       transition:fade={{ duration: 150 }}
@@ -128,8 +184,13 @@
       on:outroend={closed}>
       <div style="height: {animateContainerHeight ? $slideInSpring + 'px' : 'auto'}" class="items-container">
         <ul bind:this={resultsList}>
-          {#each filteredOptions as option (option.name)}
-            <li class="result">
+          {#each filteredOptions as option, index}
+            <li
+              on:click={() => onSelect(option)}
+              on:mousemove={() => highlightItem(index)}
+              on:mouseleave={() => unhighlightItem(index)}
+              class="result"
+              class:selected={index == selectedIndex}>
               <slot name="result" {option}>Hello World FOO Hello World Hello World Hello World Hello World</slot>
             </li>
           {:else}
