@@ -18,8 +18,14 @@
     open = false;
   }
 
-  function onFocus() {
+  function inputEngaged() {
     open = true;
+  }
+
+  function inputChanged() {
+    if (!open) {
+      open = true;
+    }
   }
 
   function filterOptions() {
@@ -85,7 +91,9 @@
   }
 
   function keyDown(evt) {
-    if (open && filteredOptions.length) {
+    if (!open && evt.keyCode == 40) {
+      open = true;
+    } else if (open && filteredOptions.length) {
       if (evt.keyCode == 40) {
         if (selectedIndex == null) {
           selectedIndex = 0;
@@ -97,6 +105,11 @@
           selectedIndex = filteredOptions.length - 1;
         } else {
           selectedIndex = selectedIndex == 0 ? filteredOptions.length - 1 : selectedIndex - 1;
+        }
+      } else if (evt.keyCode == 13) {
+        if (selectedIndex != null) {
+          onSelect(filteredOptions[selectedIndex]);
+          open = false;
         }
       }
     }
@@ -173,7 +186,15 @@
 <h1>{$slideInSpring}</h1>
 
 <div class="root" class:open>
-  <input {placeholder} bind:this={inputEl} bind:value={currentSearch} on:focus={onFocus} on:blur={onBlur} class:open />
+  <input
+    {placeholder}
+    bind:this={inputEl}
+    bind:value={currentSearch}
+    on:input={inputChanged}
+    on:click={inputEngaged}
+    on:focus={inputEngaged}
+    on:blur={onBlur}
+    class:open />
   {#if open}
     <div
       transition:fade={{ duration: 150 }}
