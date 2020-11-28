@@ -2,24 +2,20 @@
   import escapeRegex from "escape-string-regexp";
   import { spring } from "svelte/motion";
   import { fade, slide } from "svelte/transition";
-  let open = false;
 
+  export let onItemSelected;
   export let options = [];
   export let placeholder = "";
   export let filterField = "";
   export let displayField = "";
 
+  let open = false;
   let inputEl = null;
   let currentSearch = "";
   let filteredOptions = options;
   let selectedIndex = null;
   let focused = false;
 
-  function onBlur() {
-    open = false;
-    focused = false;
-  }
-  
   function inputEngaged() {
     open = true;
     focused = true;
@@ -29,6 +25,11 @@
     if (!open) {
       open = true;
     }
+  }
+
+  function onBlur() {
+    //open = false;
+    focused = false;
   }
 
   function filterOptions(options) {
@@ -49,23 +50,22 @@
   }
 
   let animateContainerHeight = false;
-  const slideInSpring = spring(0, { stiffness: 0.2, damping: 0.7 });
+  const slideInSpring = spring({ height: 0, width: 0 }, { stiffness: 0.2, damping: 0.7 });
 
-  function setSpringHeight(height, hard) {
+  function setSpringHeight(hard) {
     let maxHeightVar = getComputedStyle(document.documentElement).getPropertyValue("--svelte-helpers-auto-complete-results-max-height");
     let maxHeight = parseInt(maxHeightVar, 10);
 
-    slideInSpring.set(Math.min(resultsList.offsetHeight, maxHeight), hard ? { hard: true } : void 0);
+    console.log({ width: resultsList.offsetWidth });
+    slideInSpring.set({ height: Math.min(resultsList.offsetHeight, maxHeight), width: resultsList.offsetWidth }, hard ? { hard: true } : void 0);
   }
 
-  let itemsHeightObserver = new ResizeObserver(([{ contentRect }]) => {
-    setSpringHeight(contentRect.height);
-  });
+  let itemsHeightObserver = new ResizeObserver(() => setSpringHeight());
   let resultsList;
 
   function opening() {}
   function opened() {
-    setSpringHeight(resultsList.offsetHeight, true);
+    setSpringHeight(true);
 
     animateContainerHeight = true;
     itemsHeightObserver.observe(resultsList);
@@ -86,7 +86,10 @@
   }
 
   function onSelect(option) {
-    if (typeof option === "string") {
+    if (onItemSelected) {
+      onItemSelected(option, inputEl);
+      currentSearch = inputEl.value;
+    } else if (typeof option === "string") {
       inputEl.value = option;
     } else {
       inputEl.value = option[displayField];
@@ -169,6 +172,7 @@
   ul {
     padding: 0;
     margin: 0;
+    display: inline-block;
   }
 
   li {
@@ -207,7 +211,9 @@
       on:introend={opened}
       on:outrostart={closing}
       on:outroend={closed}>
-      <div style="height: {animateContainerHeight ? $slideInSpring + 'px' : 'auto'}" class="options-container">
+      <div
+        style="height: {animateContainerHeight ? $slideInSpring.height + 'px' : 'auto'}; width: {animateContainerHeight ? $slideInSpring.width + 'px' : 'auto'}"
+        class="options-container">
         <ul bind:this={resultsList}>
           {#each filteredOptions as option, index}
             <li

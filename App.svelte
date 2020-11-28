@@ -21,6 +21,12 @@
   fetch(booksUrl)
     .then(resp => resp.json())
     .then(res => (books = res.data.allBooks.Books));
+
+  let selectedBook;
+  function onBookSelected(option, input) {
+    selectedBook = option.title;
+    input.value = "";
+  }
 </script>
 
 <style>
@@ -50,7 +56,19 @@
   </AutoSuggest>
 
   <AutoSuggest filterField="title" displayField="title" placeholder="Search" options={books}>
-    <div slot="result" class="bookResult" let:option><span class="book-img"><img src={option.smallImage} alt="" /></span> <span>{option.title}</span></div>
+    <div slot="result" class="bookResult" let:option>
+      <span class="book-img"><img src={option.smallImage} alt="" /></span>
+      <span>{option.title}</span>
+    </div>
     <span slot="no-results" style="color: blue">No Results, yo</span>
   </AutoSuggest>
+
+  <AutoSuggest filterField="title" onItemSelected={onBookSelected} placeholder="Search" options={books}>
+    <div slot="result" class="bookResult" let:option>
+      <span class="book-img"><img src={option.smallImage} alt="" /></span>
+      <span>{option.title}</span>
+    </div>
+    <span slot="no-results" style="color: blue">No Results, yo</span>
+  </AutoSuggest>
+  Selected: {selectedBook}
 </div>
