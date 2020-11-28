@@ -1,4 +1,5 @@
 <script>
+  import { onMount } from "svelte";
   import escapeRegex from "escape-string-regexp";
   import { spring } from "svelte/motion";
   import { fade, slide } from "svelte/transition";
@@ -11,6 +12,7 @@
 
   let open = false;
   let inputEl = null;
+  let inputWidth;
   let currentSearch = "";
   let filteredOptions = options;
   let selectedIndex = null;
@@ -28,7 +30,7 @@
   }
 
   function onBlur() {
-    //open = false;
+    open = false;
     focused = false;
   }
 
@@ -52,20 +54,25 @@
   let animateContainerHeight = false;
   const slideInSpring = spring({ height: 0, width: 0 }, { stiffness: 0.2, damping: 0.7 });
 
-  function setSpringHeight(hard) {
+  function setSpringDimensions(hard) {
     let maxHeightVar = getComputedStyle(document.documentElement).getPropertyValue("--svelte-helpers-auto-complete-results-max-height");
     let maxHeight = parseInt(maxHeightVar, 10);
 
-    console.log({ width: resultsList.offsetWidth });
-    slideInSpring.set({ height: Math.min(resultsList.offsetHeight, maxHeight), width: resultsList.offsetWidth }, hard ? { hard: true } : void 0);
+    slideInSpring.set(
+      { height: Math.min(resultsList.offsetHeight, maxHeight), width: Math.max(resultsList.offsetWidth, inputEl.clientWidth) },
+      hard ? { hard: true } : void 0
+    );
   }
 
-  let itemsHeightObserver = new ResizeObserver(() => setSpringHeight());
+  let itemsHeightObserver = new ResizeObserver(() => setSpringDimensions());
+  let inputWidthObserver = new ResizeObserver(() => {
+    inputWidth = inputEl.clientWidth;
+  });
   let resultsList;
 
   function opening() {}
   function opened() {
-    setSpringHeight(true);
+    setSpringDimensions(true);
 
     animateContainerHeight = true;
     itemsHeightObserver.observe(resultsList);
@@ -120,6 +127,15 @@
       }
     }
   }
+
+  onMount(() => {
+    inputWidth = inputEl.clientWidth;
+    inputWidthObserver.observe(inputEl);
+
+    return () => {
+      inputWidthObserver.unobserve(inputEl);
+    };
+  });
 </script>
 
 <style>
@@ -214,7 +230,7 @@
       <div
         style="height: {animateContainerHeight ? $slideInSpring.height + 'px' : 'auto'}; width: {animateContainerHeight ? $slideInSpring.width + 'px' : 'auto'}"
         class="options-container">
-        <ul bind:this={resultsList}>
+        <ul bind:this={resultsList} style="min-width: {inputWidth}px">
           {#each filteredOptions as option, index}
             <li
               on:click={() => onSelect(option)}
@@ -222,7 +238,7 @@
               on:mouseleave={() => unhighlightItem(index)}
               class="result"
               class:selected={index == selectedIndex}>
-              <slot name="result" {option}>Hello World FOO Hello World Hello World Hello World Hello World</slot>
+              <slot name="result" {option}>{typeof option === 'string' ? option : option[displayField]}</slot>
             </li>
           {:else}
             <li>
