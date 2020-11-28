@@ -5,10 +5,12 @@
   import { fade, slide } from "svelte/transition";
 
   export let onItemSelected;
+  export let onBlur;
   export let options = [];
   export let placeholder = "";
   export let filterField = "";
   export let displayField = "";
+  export let filterByStartsWith = false;
 
   let open = false;
   let inputEl = null;
@@ -29,13 +31,16 @@
     }
   }
 
-  function onBlur() {
+  function inputBlurred() {
     open = false;
     focused = false;
+    onBlur && onBlur();
   }
 
   function filterOptions(options) {
-    return options.filter(item => new RegExp(escapeRegex(currentSearch), "i").test(item[filterField]));
+    return options.filter(item =>
+      new RegExp((filterByStartsWith ? "^" : "") + escapeRegex(currentSearch), "i").test(typeof item === "string" ? item : item[filterField])
+    );
   }
 
   $: {
@@ -217,7 +222,7 @@
     on:input={inputChanged}
     on:click={inputEngaged}
     on:focus={inputEngaged}
-    on:blur={onBlur}
+    on:blur={inputBlurred}
     class:open />
   {#if open}
     <div

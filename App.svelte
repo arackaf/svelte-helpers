@@ -60,6 +60,11 @@
     <span slot="no-results" style="color: blue">No Results, yo</span>
   </AutoSuggest>
 
+  <AutoSuggest filterByStartsWith={true} filterField={'name'} displayField="name" placeholder="Search" options={options.map(item => item.name)}>
+    <div slot="result" let:option>{option}</div>
+    <span slot="no-results" style="color: blue">No Results, yo</span>
+  </AutoSuggest>
+
   <AutoSuggest filterField="title" displayField="title" placeholder="Search" options={books}>
     <div slot="result" class="bookResult" let:option>
       <span class="book-img"><img src={option.smallImage} alt="" /></span>
