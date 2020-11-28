@@ -13,13 +13,16 @@
   let currentSearch = "";
   let filteredOptions = options;
   let selectedIndex = null;
+  let focused = false;
 
   function onBlur() {
     open = false;
+    focused = false;
   }
-
+  
   function inputEngaged() {
     open = true;
+    focused = true;
   }
 
   function inputChanged() {
@@ -28,12 +31,12 @@
     }
   }
 
-  function filterOptions() {
+  function filterOptions(options) {
     return options.filter(item => new RegExp(escapeRegex(currentSearch), "i").test(item[filterField]));
   }
 
   $: {
-    filteredOptions = currentSearch ? filterOptions() : options;
+    filteredOptions = currentSearch ? filterOptions(options) : options;
     selectedIndex = null;
   }
 
@@ -91,7 +94,7 @@
   }
 
   function keyDown(evt) {
-    if (!open && evt.keyCode == 40) {
+    if (!open && evt.keyCode == 40 && focused) {
       open = true;
     } else if (open && filteredOptions.length) {
       if (evt.keyCode == 40) {
@@ -122,9 +125,10 @@
     --svelte-helpers-auto-complete-border-width: 1px;
     --svelte-helpers-auto-complete-border-radius: 4px;
     --svelte-helpers-auto-complete-item-padding: 5px;
-    --svelte-helpers-auto-complete-results-max-height: 200px;
+    --svelte-helpers-auto-complete-results-max-height: 300px;
     --svelte-helpers-auto-complete-item-hover-background: lightgray;
     --svelte-helpers-auto-complete-item-hover-cursor: pointer;
+    --svelte-helpers-auto-complete-options-background-color: white;
   }
 
   .root {
@@ -144,11 +148,11 @@
     border-bottom-right-radius: 0;
   }
 
-  .items-root {
+  .options-root {
     position: relative;
   }
 
-  .items-container {
+  .options-container {
     min-width: calc(100% - 2 * var(--svelte-helpers-auto-complete-border-width));
     border: var(--svelte-helpers-auto-complete-border-width) solid var(--svelte-helpers-auto-complete-border-color);
     border-radius: var(--svelte-helpers-auto-complete-border-radius);
@@ -159,6 +163,7 @@
     top: calc(-1 * var(--svelte-helpers-auto-complete-border-width));
     max-height: var(--svelte-helpers-auto-complete-results-max-height);
     overflow: auto;
+    background-color: var(--svelte-helpers-auto-complete-options-background-color);
   }
 
   ul {
@@ -183,7 +188,6 @@
 </style>
 
 <svelte:window on:keydown={keyDown} />
-<h1>{$slideInSpring}</h1>
 
 <div class="root" class:open>
   <input
@@ -198,12 +202,12 @@
   {#if open}
     <div
       transition:fade={{ duration: 150 }}
-      class="items-root"
+      class="options-root"
       on:introstart={opening}
       on:introend={opened}
       on:outrostart={closing}
       on:outroend={closed}>
-      <div style="height: {animateContainerHeight ? $slideInSpring + 'px' : 'auto'}" class="items-container">
+      <div style="height: {animateContainerHeight ? $slideInSpring + 'px' : 'auto'}" class="options-container">
         <ul bind:this={resultsList}>
           {#each filteredOptions as option, index}
             <li
