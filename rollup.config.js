@@ -8,7 +8,16 @@ const getConfig = ({ file, output }) => ({
     file: output || file
   },
   plugins: [svelte({})],
-  external: ["svelte", "svelte/internal", "svelte/store", "svelte/easing", "svelte/transition", "svelte-helpers/animation"]
+  external: [
+    "svelte",
+    "svelte/internal",
+    "svelte/store",
+    "svelte/easing",
+    "svelte/transition",
+    "svelte/motion",
+    "svelte-helpers/animation",
+    "escape-string-regexp"
+  ]
 });
 
 module.exports = [

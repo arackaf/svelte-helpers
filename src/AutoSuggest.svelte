@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import escapeRegex from "escape-string-regexp";
   import { spring } from "svelte/motion";
-  import { fade, slide } from "svelte/transition";
+  import { fade } from "svelte/transition";
 
   export let onItemSelected;
   export let onBlur;
@@ -151,10 +151,10 @@
     --svelte-helpers-auto-complete-border-color: lightgray;
     --svelte-helpers-auto-complete-border-width: 1px;
     --svelte-helpers-auto-complete-border-radius: 4px;
-    --svelte-helpers-auto-complete-item-padding: 5px;
+    --svelte-helpers-auto-complete-option-padding: 5px;
     --svelte-helpers-auto-complete-results-max-height: 300px;
-    --svelte-helpers-auto-complete-item-hover-background: lightgray;
-    --svelte-helpers-auto-complete-item-hover-cursor: pointer;
+    --svelte-helpers-auto-complete-option-hover-background: lightgray;
+    --svelte-helpers-auto-complete-option-cursor: pointer;
     --svelte-helpers-auto-complete-options-background-color: white;
   }
 
@@ -165,7 +165,7 @@
 
   input {
     border: var(--svelte-helpers-auto-complete-border-width) solid var(--svelte-helpers-auto-complete-border-color);
-    border-radius: 5px;
+    border-radius: var(--svelte-helpers-auto-complete-border-radius);
     padding: 5px;
     outline: none;
   }
@@ -202,16 +202,16 @@
   li {
     list-style-type: none;
     white-space: nowrap;
-    padding: var(--svelte-helpers-auto-complete-item-padding);
+    padding: var(--svelte-helpers-auto-complete-option-padding);
     margin: 0;
   }
 
   :global(li.result) {
-    cursor: var(--svelte-helpers-auto-complete-item-hover-cursor);
+    cursor: var(--svelte-helpers-auto-complete-option-cursor);
   }
 
   :global(li.selected) {
-    background-color: var(--svelte-helpers-auto-complete-item-hover-background);
+    background-color: var(--svelte-helpers-auto-complete-option-hover-background);
   }
 </style>
 

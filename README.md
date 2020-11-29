@@ -77,16 +77,31 @@ The modal and overlay will both animate in and out, although these animations ar
 </Modal>
 ```
 
-Live demo coming soon - this project is incredibly new still...
+### Live Demo
+
+[Here](https://codesandbox.io/s/modal-vvycm?file=/App.svelte)
+
+### Style Overrides
+
+The modal has a global css class of `svelte-helpers-modal-content` applied. Add your own overrides as needed.
+
 
 ## AutoSuggest
 
 ```svelte
+<script>
+  import AutoSuggest from "svelte-helpers/AutoSuggest";
+</script>
+
 <AutoSuggest filterField={'name'} displayField="name" placeholder="Search" {options}>
   <div slot="result" let:option>{option.name}</div>
   <span slot="no-results" style="color: blue">No Results, yo</span>
 </AutoSuggest>
 ```
+
+### Live Demo
+
+[Here](https://codesandbox.io/s/auto-suggest-4puis?file=/App.svelte)
 
 ### Props
 
@@ -104,4 +119,20 @@ Live demo coming soon - this project is incredibly new still...
 ### Slots
 
 `result` - the slot for each option the user is viewing
+<br />
 `no-results` - the slot to show when there are no results to display
+
+### CSS Overrides
+
+The following CSS variables can be overridden to customize this component's appearance 
+
+| Var | Purpose |
+| ---- | ----- |
+|`--svelte-helpers-auto-complete-border-color` | Border color for the input and options container |
+|`--svelte-helpers-auto-complete-border-width` | Border width for the input and options container | 
+|`--svelte-helpers-auto-complete-border-radius` | Border radius for the input and options container |
+|`--svelte-helpers-auto-complete-option-padding` | Padding of each result option |
+|`--svelte-helpers-auto-complete-results-max-height` | Options container max height |
+|`--svelte-helpers-auto-complete-option-hover-background` | Option background color when hovered |
+|`--svelte-helpers-auto-complete-option-cursor` | Cursor for options |
+|`--svelte-helpers-auto-complete-options-background-color` | Options container background color |
