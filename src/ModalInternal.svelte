@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import { expoOut, quintIn } from "svelte/easing";
 
-  import { springIn, springOut } from "svelte-helpers/spring-transitions";
+  import { springIn, springOut } from "./spring-transitions";
 
   const { tickToValue: modalSpringIn, duration: springInDuration } = springIn(-30, 0, { stiffness: 0.1, damping: 0.35, precision: 0.01 });
 

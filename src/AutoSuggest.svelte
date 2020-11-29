@@ -8,6 +8,7 @@
   export let onBlur;
   export let options = [];
   export let placeholder = "";
+  export let inputStyles = "";
   export let filterField = "";
   export let displayField = "";
   export let filterByStartsWith = false;
@@ -223,7 +224,8 @@
     on:click={inputEngaged}
     on:focus={inputEngaged}
     on:blur={inputBlurred}
-    class:open />
+    class:open
+    style={inputStyles} />
   {#if open}
     <div
       transition:fade={{ duration: 150 }}
