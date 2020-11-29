@@ -110,7 +110,9 @@
   }
 
   function keyDown(evt) {
-    if (!open && evt.keyCode == 40 && focused) {
+    if (evt.keyCode == 27 && open) {
+      open = false;
+    } else if (!open && evt.keyCode == 40 && focused) {
       open = true;
     } else if (open && filteredOptions.length) {
       if (evt.keyCode == 40) {
