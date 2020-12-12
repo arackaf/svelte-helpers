@@ -49,8 +49,6 @@ modules.forEach(name => app.get("/" + name, browseToSvelte));
 //   res.end();
 // });
 
-app.get("/*.js", express.static(__dirname + "/dist/"));
-
 function browseToSvelte(request, response) {
   response.sendFile(path.join(__dirname + "/dist/index.html"));
 }

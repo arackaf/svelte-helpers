@@ -1,5 +1,5 @@
 <script>
-  import { sineOut } from "svelte/easing";
+  import { quadOut } from "svelte/easing";
   import { fade } from "svelte/transition";
 
   export let onClose = () => {};
@@ -7,6 +7,10 @@
 
   function overLayClicked(evt) {
     let target = evt.target;
+    if (!document.body.contains(target)) {
+      //clicked on something that no longer exists - assume it was something on the modal that's been removed
+      return;
+    }
     do {
       if (target == modalNode) return;
     } while ((target = target.parentNode));
@@ -30,6 +34,6 @@
   }
 </style>
 
-<div transition:fade={{ duration: 250, easing: sineOut }} class="svelte-modal-overlay" on:click={overLayClicked}>
+<div transition:fade={{ duration: 250, easing: quadOut }} class="svelte-modal-overlay" on:click={overLayClicked}>
   <slot />
 </div>
