@@ -32,6 +32,7 @@
     max-width: 600px;
     border-radius: 5px;
     border: 2px solid darkblue;
+    overflow: hidden;
   }
 
   @media (max-width: 1000px) {
@@ -67,7 +68,7 @@
 </style>
 
 <div style="display: none;">
-  <div bind:this={contentNode} class="svelte-helpers-modal-content">
+  <div bind:this={contentNode}>
     <slot />
   </div>
 </div>

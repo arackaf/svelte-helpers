@@ -1,20 +1,64 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount, setContext } from "svelte";
+  import { spring } from "svelte/motion";
   import { expoOut, quintIn } from "svelte/easing";
+  import { writable } from "svelte/store";
 
   import { springIn, springOut } from "./spring-transitions";
 
-  const { tickToValue: modalSpringIn, duration: springInDuration } = springIn(-30, 0, { stiffness: 0.1, damping: 0.35, precision: 0.01 });
+  const OPEN_SPRING = { stiffness: 0.1, damping: 0.35, precision: 0.01 };
+  const CLOSE_SPRING = { stiffness: 0.1, damping: 0.5, precision: 0.01 };
 
-  const outSpring = { stiffness: 0.1, damping: 0.5, precision: 0.01 };
-  const { tickToValue: modalSpringOut, duration: springOutDuration } = springOut(0, 30, outSpring);
+  const { tickToValue: modalSpringIn, duration: springInDuration } = springIn(-30, 0, OPEN_SPRING);
+
+  const { tickToValue: modalSpringOut, duration: springOutDuration } = springOut(0, 30, CLOSE_SPRING);
 
   let root;
+  let innerContent;
   export let node;
 
-  onMount(() => {
-    root.appendChild(node);
+  export let animateDimensions = true;
+  const animatingDimensions = writable(animateDimensions);
+
+  let hasInitialSize = false;
+  const { sizingSpring, sync } = getDimensionsSpring();
+
+  $: animatedHeight = hasInitialSize ? $sizingSpring.height + "px" : "auto";
+  $: animatedWidth = hasInitialSize ? $sizingSpring.width + "px" : "auto";
+
+  function getDimensionsSpring() {
+    const sizingSpring = spring({ height: 0, width: 0 }, { ...OPEN_SPRING, precision: 0.5 });
+
+    const getConfig = () => {
+      let immediate = !hasInitialSize || !$animatingDimensions;
+      return immediate ? { hard: true } : {};
+    };
+
+    const sync = ({ height, width }) => {
+      sizingSpring.set({ height, width }, getConfig());
+    };
+
+    return { sync, sizingSpring };
+  }
+
+  const ro = new ResizeObserver(() => {
+    sync({ height: innerContent.offsetHeight, width: innerContent.offsetWidth });
+    if (!hasInitialSize) {
+      hasInitialSize = true;
+    }
   });
+
+  onMount(() => {
+    innerContent.appendChild(node);
+    ro.observe(innerContent);
+    return () => {
+      ro.unobserve(innerContent);
+    };
+  });
+
+  function onHidden() {
+    hasInitialSize = false;
+  }
 
   function modalIn() {
     return {
@@ -27,7 +71,7 @@
           transform: translate3d(0px, ${transformY}px, 0px);
           opacity: ${opacity};
         `;
-      },
+      }
     };
   }
 
@@ -42,11 +86,21 @@
           transform: translate3d(0px, ${easedTransform}px, 0px);
           opacity: ${easedOpacity}
         `;
-      },
+      }
     };
   }
 </script>
 
-<div class="modal" in:modalIn out:modalOut bind:this={root}>
-  <slot />
+<style>
+  :global(.svelte-helpers-modal-outer-container) {
+    overflow: hidden;
+  }
+</style>
+
+<div class="modal" in:modalIn out:modalOut on:outroend={onHidden} bind:this={root}>
+  <div class="svelte-helpers-modal-content" style="height: {animatedHeight}; width: {animatedWidth}">
+    <div bind:this={innerContent}>
+      <slot />
+    </div>
+  </div>
 </div>

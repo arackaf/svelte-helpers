@@ -2,13 +2,13 @@
   import Modal from "./src/Modal.svelte";
   let open = false;
   let more = false;
+  let wide = false;
 </script>
 
-{open} - {more}
 <button on:click={() => (open = true)}>Open</button>
 
 <Modal {open} onClose={() => (open = false)}>
-  <div>
+  <div style="width: 400px">
     <p>
       Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam erat nunc, sagittis id nibh non, eleifend malesuada libero. Morbi ex lorem,
       tempor quis dapibus vel, faucibus a eros. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Mauris
@@ -17,6 +17,7 @@
       ultrices risus, ut placerat ante venenatis at. Vivamus sed dui vitae eros hendrerit viverra sed at ex.
     </p>
     <button on:click={() => (more = !more)}>Toggle More</button>
+    <button on:click={() => (wide = !wide)}>Toggle Wide</button>
 
     {#if more}
       <p>
@@ -28,4 +29,8 @@
       </p>
     {/if}
   </div>
+
+  {#if wide}
+    <div style="width: 70vw; height: 300px; background-color: blue" />
+  {/if}
 </Modal>
