@@ -22,6 +22,6 @@
 
 {#each $modalState.modals as packet}
   <Overlay onClose={packet.onClose} modalNode={packet.node}>
-    <ModalInternal node={packet.node} useContentWidth={packet.useContentWidth} />
+    <ModalInternal node={packet.node} animatingDimensions={packet.animatingDimensions} useContentWidth={packet.useContentWidth} />
   </Overlay>
 {/each}

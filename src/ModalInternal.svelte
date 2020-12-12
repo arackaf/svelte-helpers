@@ -1,10 +1,13 @@
 <script>
-  import { onMount, setContext } from "svelte";
+  import { onMount, getContext } from "svelte";
   import { spring } from "svelte/motion";
   import { expoOut, quintIn } from "svelte/easing";
-  import { writable } from "svelte/store";
 
   import { springIn, springOut } from "./spring-transitions";
+
+  export let node;
+  export let useContentWidth;
+  export let animatingDimensions;
 
   const OPEN_SPRING = { stiffness: 0.1, damping: 0.35, precision: 0.01 };
   const CLOSE_SPRING = { stiffness: 0.1, damping: 0.5, precision: 0.01 };
@@ -15,12 +18,6 @@
 
   let root;
   let innerContent;
-  export let node;
-
-  export let animateDimensions = true;
-  const animatingDimensions = writable(animateDimensions);
-
-  export let useContentWidth;
 
   let hasInitialSize = false;
   const { sizingSpring, sync } = getDimensionsSpring();

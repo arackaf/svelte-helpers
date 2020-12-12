@@ -1,5 +1,6 @@
 <script>
-  import { onMount, afterUpdate } from "svelte";
+  import { onMount, afterUpdate, setContext } from "svelte";
+  import { writable } from "svelte/store";
   import modalState from "./modalState";
   import "./modalInit";
 
@@ -9,13 +10,17 @@
   let contentNode;
   let currentlyOpen = false;
 
+  export let animateDimensions = true;
+  const animatingDimensions = writable(animateDimensions);
+  setContext("svelte-helpers-modal-animation-settings", animatingDimensions);
+
   onMount(sync);
   afterUpdate(sync);
 
   function sync() {
     if (!currentlyOpen && open) {
       currentlyOpen = true;
-      modalState.update(state => ({ ...state, modals: [...state.modals, { node: contentNode, onClose, useContentWidth }] }));
+      modalState.update(state => ({ ...state, modals: [...state.modals, { node: contentNode, onClose, useContentWidth, animatingDimensions }] }));
     } else if (currentlyOpen && !open) {
       currentlyOpen = false;
       modalState.update(state => ({ ...state, modals: state.modals.filter(d => d.node != contentNode) }));
