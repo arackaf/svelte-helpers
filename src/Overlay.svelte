@@ -4,15 +4,16 @@
 
   export let onClose = () => {};
   export let modalNode;
-
+  
   function overLayClicked(evt) {
+    const modalRoot = modalNode.parentNode.parentNode;
     let target = evt.target;
     if (!document.body.contains(target)) {
       //clicked on something that no longer exists - assume it was something on the modal that's been removed
       return;
     }
     do {
-      if (target == modalNode) return;
+      if (target == modalRoot) return;
     } while ((target = target.parentNode));
 
     onClose();

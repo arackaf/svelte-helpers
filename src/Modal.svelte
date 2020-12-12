@@ -5,6 +5,7 @@
 
   export let open = false;
   export let onClose = () => {};
+  export let useContentWidth = false;
   let contentNode;
   let currentlyOpen = false;
 
@@ -14,7 +15,7 @@
   function sync() {
     if (!currentlyOpen && open) {
       currentlyOpen = true;
-      modalState.update(state => ({ ...state, modals: [...state.modals, { node: contentNode, onClose }] }));
+      modalState.update(state => ({ ...state, modals: [...state.modals, { node: contentNode, onClose, useContentWidth }] }));
     } else if (currentlyOpen && !open) {
       currentlyOpen = false;
       modalState.update(state => ({ ...state, modals: state.modals.filter(d => d.node != contentNode) }));
@@ -24,45 +25,58 @@
 
 <style>
   :global(.svelte-helpers-modal-content) {
-    width: 50vw;
+    --modal-width: 50vw;
+    --modal-content-padding: 2rem;
+    width: var(--modal-width);
     margin: 10vh auto;
     background: white;
-    padding: 2rem;
     outline: none;
     max-width: 600px;
     border-radius: 5px;
     border: 2px solid darkblue;
     overflow: hidden;
   }
+  :global(.svelte-helpers-modal-content > *) {
+    padding: var(--modal-content-padding);
+  }
+  :global(.svelte-helpers-modal-content.content-width) {
+    display: flex;
+    width: unset;
+    max-width: unset;
+  }
+  :global(.svelte-helpers-modal-content.content-width > *) {
+    align-self: baseline;
+  }
 
   @media (max-width: 1000px) {
     :global(.svelte-helpers-modal-content) {
-      width: 55vw;
+      --modal-width: 55vw;
     }
   }
   @media (max-width: 800px) {
     :global(.svelte-helpers-modal-content) {
-      width: 60vw;
+      --modal-width: 60vw;
     }
   }
   @media (max-width: 650px) {
     :global(.svelte-helpers-modal-content) {
-      width: 70vw;
+      --modal-width: 70vw;
     }
   }
   @media (max-width: 600px) {
     :global(.svelte-helpers-modal-content) {
-      width: 80vw;
+      --modal-width: 80vw;
+      --modal-content-padding: 1rem
     }
   }
   @media (max-width: 550px) {
     :global(.svelte-helpers-modal-content) {
-      width: 90vw;
+      --modal-width: 90vw;
     }
   }
   @media (max-width: 500px) {
     :global(.svelte-helpers-modal-content) {
-      width: 95vw;
+      --modal-width: 95vw;
     }
   }
 </style>

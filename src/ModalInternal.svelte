@@ -20,11 +20,16 @@
   export let animateDimensions = true;
   const animatingDimensions = writable(animateDimensions);
 
+  export let useContentWidth;
+
   let hasInitialSize = false;
   const { sizingSpring, sync } = getDimensionsSpring();
 
-  $: animatedHeight = hasInitialSize ? $sizingSpring.height + "px" : "auto";
-  $: animatedWidth = hasInitialSize ? $sizingSpring.width + "px" : "auto";
+  $: animatedHeight = hasInitialSize ? $sizingSpring.height + "px" : "";
+  $: animatedWidth = hasInitialSize && useContentWidth ? $sizingSpring.width + "px" : "";
+  $: dimensionStyles = [`${animatedHeight ? "height: " + animatedHeight : ""}`, `${animatedWidth ? "width: " + animatedWidth : ""}`]
+    .filter(s => s)
+    .join(";");
 
   function getDimensionsSpring() {
     const sizingSpring = spring({ height: 0, width: 0 }, { ...OPEN_SPRING, precision: 0.5 });
@@ -98,7 +103,7 @@
 </style>
 
 <div class="modal" in:modalIn out:modalOut on:outroend={onHidden} bind:this={root}>
-  <div class="svelte-helpers-modal-content" style="height: {animatedHeight}; width: {animatedWidth}">
+  <div class="svelte-helpers-modal-content" class:content-width={useContentWidth} style={dimensionStyles}>
     <div bind:this={innerContent}>
       <slot />
     </div>
