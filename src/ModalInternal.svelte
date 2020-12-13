@@ -1,5 +1,5 @@
 <script>
-  import { onMount, getContext } from "svelte";
+  import { onMount } from "svelte";
   import { spring } from "svelte/motion";
   import { expoOut, quintIn } from "svelte/easing";
 

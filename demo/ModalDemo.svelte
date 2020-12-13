@@ -1,5 +1,5 @@
 <script>
-  import Modal, { closeModal } from "./src/modal";
+  import Modal, { closeModal } from "../src/modal";
   import ModalDemo1 from "./ModalDemo1.svelte";
   import ModalDemo2 from "./ModalDemo2.svelte";
 

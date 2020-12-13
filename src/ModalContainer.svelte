@@ -4,7 +4,6 @@
 
   import modalState from "./modalState";
   import ModalInternal from "./ModalInternal.svelte";
-  import App from "../App.svelte";
 
   const keyDown = evt => {
     if (evt.keyCode == 27) {
