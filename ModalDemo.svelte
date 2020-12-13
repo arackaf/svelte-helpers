@@ -14,20 +14,12 @@
       closeModal("modal3");
     }, 2000);
   }
-
-  function button4() {
-    open4 = true;
-    setTimeout(() => {
-      closeModal("modal4");
-    }, 2000);
-  }
 </script>
 
 <button on:click={() => (open = true)}>Open</button>
 <button on:click={() => (open2 = true)}>Open2</button>
 <button on:click={() => (open3 = true)}>Open3</button>
 <button on:click={button3}>Open3 (auto close)</button>
-<button on:click={button4}>Open4 (auto close)</button>
 
 <Modal {open} onClose={() => (open = false)}>
   <ModalDemo1 />

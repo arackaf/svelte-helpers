@@ -13,15 +13,15 @@
   let contentNode;
   let currentlyOpen = false;
 
-  export let animateDimensions = true;
-  const animatingDimensions = writable(animateDimensions);
+  export let animateResizing = true;
+  const isAnimatingResizing = writable(animateResizing);
 
   let closeIt = () => {
     currentlyOpen = false;
     modalState.update(state => ({ ...state, modals: state.modals.filter(d => d.node != contentNode) }));
   };
 
-  setContext("svelte-helpers-modal", { animatingDimensions, onClose: deferStateChangeOnClose ? closeIt : onClose });
+  setContext("svelte-helpers-modal", { isAnimatingResizing, onClose: deferStateChangeOnClose ? closeIt : onClose });
 
   onMount(() => {
     sync();
@@ -36,12 +36,12 @@
   function sync() {
     if (!currentlyOpen && open) {
       currentlyOpen = true;
-      let props = { onClose };
+      let props = { onClose, modalKey, node: contentNode, isAnimatingResizing, useContentWidth };
       if (deferStateChangeOnClose) {
         props.onClose = closeIt;
         props.onHide = onClose;
       }
-      modalState.update(state => ({ ...state, modals: [...state.modals, { modalKey, node: contentNode, animatingDimensions, useContentWidth, ...props }] }));
+      modalState.update(state => ({ ...state, modals: [...state.modals, props] }));
     } else if (currentlyOpen && !open) {
       closeIt();
     }

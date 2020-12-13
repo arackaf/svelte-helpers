@@ -7,11 +7,13 @@
 
   export let node;
   export let useContentWidth;
-  export let animatingDimensions;
+  export let isAnimatingResizing;
   export let onHide;
 
   const OPEN_SPRING = { stiffness: 0.1, damping: 0.35, precision: 0.01 };
   const CLOSE_SPRING = { stiffness: 0.1, damping: 0.5, precision: 0.01 };
+  // const DIMENSIONS_SPRING = { stiffness: 0.1, damping: 0.5, precision: 0.01 };
+  const DIMENSIONS_SPRING = { stiffness: 0.2, damping: 0.6, precision: 0.01 };
 
   const { tickToValue: modalSpringIn, duration: springInDuration } = springIn(-30, 0, OPEN_SPRING);
 
@@ -30,10 +32,10 @@
     .join(";");
 
   function getDimensionsSpring() {
-    const sizingSpring = spring({ height: 0, width: 0 }, { ...OPEN_SPRING, precision: 0.5 });
+    const sizingSpring = spring({ height: 0, width: 0 }, { ...DIMENSIONS_SPRING, precision: 0.5 });
 
     const getConfig = () => {
-      let immediate = !hasInitialSize || !$animatingDimensions;
+      let immediate = !hasInitialSize || !$isAnimatingResizing;
       return immediate ? { hard: true } : {};
     };
 
