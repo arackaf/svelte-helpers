@@ -22,7 +22,6 @@ const getConfig = ({ file, output }) => ({
 
 module.exports = [
   getConfig({ file: "spring-transitions.js" }),
-  getConfig({ file: "closeModal.js" }),
   getConfig({ file: "Modal.svelte", output: "Modal.js" }),
   getConfig({ file: "AutoSuggest.svelte", output: "AutoSuggest.js" })
 ];

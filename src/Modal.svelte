@@ -1,19 +1,23 @@
 <script>
-  import { onMount, afterUpdate, setContext } from "svelte";
+  import { onMount, afterUpdate, setContext, createEventDispatcher } from "svelte";
   import { writable } from "svelte/store";
   import modalState from "./modalState";
   import "./modalInit";
 
   export let open = false;
-  export let onClose = () => {};
   export let useContentWidth = false;
   export let deferStateChangeOnClose = false;
   export let modalKey = "";
+  export let animateResizing = true;
+  
+  const dispatch = createEventDispatcher();
+  let onClose = () => {
+    dispatch("close");
+  };
 
   let contentNode;
   let currentlyOpen = false;
 
-  export let animateResizing = true;
   const isAnimatingResizing = writable(animateResizing);
 
   let closeIt = () => {

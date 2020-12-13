@@ -57,9 +57,9 @@ const animateOut = node => {
 
 ## Modal
 
-A declarative modal component. Receives an `open` prop that, when true, renders the modal with an overlay behind it. The modal also takes an `onClose` function that's called when the user clicks outside the modal, or presses escape. This function should ultimately cause your `open` prop to become false.
+A declarative modal component. Receives an `open` prop that, when true, renders the modal with an overlay behind it. The modal fires a `close` event when the user clicks outside the modal, or presses escape. The handler should ultimately cause your `open` prop to become false.
 
-The modal and overlay will both animate in and out, although these animations are not (yet) configurable.
+The modal and overlay will both animate in and out. These animations are not (yet) configurable.
 
 ```svelte
 <script>
@@ -71,7 +71,7 @@ The modal and overlay will both animate in and out, although these animations ar
 
 <button on:click={openModal1}>Show Modal</button>
 
-<Modal open={modalOpen} onClose={closeModal1}>
+<Modal open={modalOpen} on:close={closeModal1}>
   <h1>Hi there</h1>
   <button on:click={() => (modalOpen = false)}>Close</button>
 </Modal>
@@ -81,10 +81,49 @@ The modal and overlay will both animate in and out, although these animations ar
 
 [Here](https://codesandbox.io/s/modal-vvycm?file=/App.svelte)
 
+### Props
+
+| Prop                 | Type | Description |
+| -------------------- | ------------------------------ | ------------|
+| `open`            | `bool`       | Whether the modal is open |
+| `on:close`        | `function`   | Called when the user clicks outside the modal, or presses escape. This should set state so the `open` prop becomes false |
+| `useContentWidth` | `bool`       | By default, the modal has a set, responsive width (that's overridable with css). Set this to true to have the modal's width size freely with your content |
+| `animateResizing` | `bool` | By default changes to the modal's dimensions will animate. Pass false to turn this off. |
+| `deferStateChangeOnClose` | `bool` | Used for conditionally rendering the modal itself. See below |
+| `modalKey` | `string` | Used for conditionally rendering the modal itself. See below |
+
+### Conditional Rendering
+
+If you need to conditionally render the modal, ie something like this
+
+```svelte
+<script>
+  import Modal, { closeModal } from "svelte-helpers/Modal";
+</script>
+
+{#if open3}
+  <Modal modalKey="modal3" open={true} deferStateChangeOnClose={true} on:close={() => (open3 = false)} useContentWidth={true}>
+    <ModalDemo2 />
+  </Modal>
+{/if}
+```
+
+Pass `true` to the `deferStateChangeOnClose` prop. Doing this will cause the close behavior of the modal to first run the standard exit animation, and then, once the modal is gone, fire the `close` event, to reset your state. 
+
+If you need to imperatively close a modal that's conditionally rendered, pass it a `modalKey`, and import the `closeModal` method, like above, then call `closeModal` and pass in your key. This is only for modal's that are conditionally rendered, and is a workaround that'll go away once Svelte gets portals.
+
+### Context
+
+Within a modal there is a `svelte-helpers-modal` context value that's an object, with the following properties 
+
+| Prop                 | Type | Description |
+| -------------------- | ------------------------------ | ------------|
+| `onClose`            | `function`       | Closes the current modal. Can be used regardless of whether the modal is conditionally rendered. |
+| `isAnimatingResizing` | `writable<bool>`   | Writable store of a boolean value, that controls whether changes to the modal's dimensions are animated. This defaults to true, or whatever you pass to `animateResizing`, but can be changed any time. For example, you might flip it to false while running your own animations in the modal's content, and revert it to true when finished. |
+
 ### Style Overrides
 
 The modal has a global css class of `svelte-helpers-modal-content` applied. Add your own overrides as needed.
-
 
 ## AutoSuggest
 
