@@ -8,6 +8,7 @@
   export let node;
   export let useContentWidth;
   export let animatingDimensions;
+  export let onHide;
 
   const OPEN_SPRING = { stiffness: 0.1, damping: 0.35, precision: 0.01 };
   const CLOSE_SPRING = { stiffness: 0.1, damping: 0.5, precision: 0.01 };
@@ -60,6 +61,7 @@
 
   function onHidden() {
     hasInitialSize = false;
+    onHide && onHide();
   }
 
   function modalIn() {

@@ -7,23 +7,43 @@
   export let open = false;
   export let onClose = () => {};
   export let useContentWidth = false;
+  export let deferStateChangeOnClose = false;
+  export let modalKey = "";
+
   let contentNode;
   let currentlyOpen = false;
 
   export let animateDimensions = true;
   const animatingDimensions = writable(animateDimensions);
-  setContext("svelte-helpers-modal-animation-settings", animatingDimensions);
 
-  onMount(sync);
+  let closeIt = () => {
+    currentlyOpen = false;
+    modalState.update(state => ({ ...state, modals: state.modals.filter(d => d.node != contentNode) }));
+  };
+
+  setContext("svelte-helpers-modal", { animatingDimensions, onClose: deferStateChangeOnClose ? closeIt : onClose });
+
+  onMount(() => {
+    sync();
+    return () => {
+      if (currentlyOpen) {
+        closeIt();
+      }
+    };
+  });
   afterUpdate(sync);
 
   function sync() {
     if (!currentlyOpen && open) {
       currentlyOpen = true;
-      modalState.update(state => ({ ...state, modals: [...state.modals, { node: contentNode, onClose, useContentWidth, animatingDimensions }] }));
+      let props = { onClose };
+      if (deferStateChangeOnClose) {
+        props.onClose = closeIt;
+        props.onHide = onClose;
+      }
+      modalState.update(state => ({ ...state, modals: [...state.modals, { modalKey, node: contentNode, animatingDimensions, useContentWidth, ...props }] }));
     } else if (currentlyOpen && !open) {
-      currentlyOpen = false;
-      modalState.update(state => ({ ...state, modals: state.modals.filter(d => d.node != contentNode) }));
+      closeIt();
     }
   }
 </script>
@@ -71,7 +91,7 @@
   @media (max-width: 600px) {
     :global(.svelte-helpers-modal-content) {
       --modal-width: 80vw;
-      --modal-content-padding: 1rem
+      --modal-content-padding: 1rem;
     }
   }
   @media (max-width: 550px) {

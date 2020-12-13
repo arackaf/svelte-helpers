@@ -7,7 +7,7 @@
   let heightSpring = spring(0, { stiffness: 0.1, damping: 0.1, precision: 0.01 });
   //let heightSpring = spring(0, { stiffness: 0.9, damping: 0.9, precision: 0.01 });
   // let heightSpring = spring(0, { stiffness: 0.1, damping: 0.5, precision: 0.01 });
-  let animatingDimensions = getContext("svelte-helpers-modal-animation-settings");
+  let { animatingDimensions, onClose } = getContext("svelte-helpers-modal");
 
   $: {
     let open = more;
@@ -28,6 +28,10 @@
   </p>
   <button on:click={() => (more = !more)}>Toggle More</button>
   <button on:click={() => (wide = !wide)}>Toggle Wide</button>
+
+  <br />
+
+  <button on:click={onClose}>Close</button>
 
   <div style="height: {$heightSpring}px; overflow: hidden">
     <p style="margin: 0">
