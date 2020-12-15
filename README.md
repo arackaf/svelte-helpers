@@ -149,6 +149,8 @@ The modal has a global css class of `svelte-helpers-modal-content` applied. Add 
 | `options`            | `[object]` or `[string]`       | The options to show |
 | `placeholder`        | `string`                       | The input's placeholder |
 | `inputStyles`        | `string`                       | The input's styles, if any |
+| `inputProps`        | `object`                       | Any props (attributes) you'd like to apply to the input |
+| `currentSearch`        | `string`                       | The currently searched for text. Bind to this if you'd like to control the input's value |
 | `onItemSelected`     | `(item, inputElement) => void`</span> | Optional callback to call when an item is selected. By default the input will fill its value with the selected item's `displayField` if it's an object, or the item itself if it's a string. If this callback is provided, it will be called and nothing else will happen. |
 | `onBlur`             | `() => void`                   | Optional callback to call when the input loses focus.  |
 | `filterField`        | `string`                       | If options are objects, this specifies the prop to filter by |

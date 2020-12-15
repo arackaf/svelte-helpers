@@ -12,11 +12,12 @@
   export let filterField = "";
   export let displayField = "";
   export let filterByStartsWith = false;
+  export let currentSearch = "";
+  export let inputProps = {};
 
   let open = false;
   let inputEl = null;
   let inputWidth;
-  let currentSearch = "";
   let filteredOptions = options;
   let selectedIndex = null;
   let focused = false;
@@ -101,7 +102,6 @@
   function onSelect(option) {
     if (onItemSelected) {
       onItemSelected(option, inputEl);
-      currentSearch = inputEl.value;
     } else if (typeof option === "string") {
       inputEl.value = option;
     } else {
@@ -163,6 +163,10 @@
     flex-direction: column;
   }
 
+  .root * {
+    box-sizing: content-box;
+	}
+
   input {
     border: var(--svelte-helpers-auto-complete-border-width) solid var(--svelte-helpers-auto-complete-border-color);
     border-radius: var(--svelte-helpers-auto-complete-border-radius);
@@ -170,7 +174,7 @@
     outline: none;
   }
 
-  :global(input.open) {
+  .root :global(input.open) {
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
   }
@@ -227,7 +231,8 @@
     on:focus={inputEngaged}
     on:blur={inputBlurred}
     class:open
-    style={inputStyles} />
+    style={inputStyles}
+    {...inputProps} />
   {#if open}
     <div
       transition:fade={{ duration: 150 }}
