@@ -179,19 +179,13 @@
     border-bottom-right-radius: 0;
   }
 
-  .options-root {
-    position: relative;
-  }
-
   .options-container {
-    min-width: calc(100% - 2 * var(--svelte-helpers-auto-complete-border-width));
+    margin-top: calc(-1 * var(--svelte-helpers-auto-complete-border-width));
     border: var(--svelte-helpers-auto-complete-border-width) solid var(--svelte-helpers-auto-complete-border-color);
     border-radius: var(--svelte-helpers-auto-complete-border-radius);
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     position: absolute;
-    left: 0;
-    top: calc(-1 * var(--svelte-helpers-auto-complete-border-width));
     max-height: var(--svelte-helpers-auto-complete-results-max-height);
     overflow: auto;
     background-color: var(--svelte-helpers-auto-complete-options-background-color);
