@@ -107,6 +107,7 @@
     } else {
       inputEl.value = option[displayField];
     }
+    open = false;
   }
 
   function keyDown(evt) {
@@ -244,6 +245,7 @@
               on:click={() => onSelect(option)}
               on:mousemove={() => highlightItem(index)}
               on:mouseleave={() => unhighlightItem(index)}
+              on:mousedown={evt => evt.preventDefault()}
               class="result"
               class:selected={index == selectedIndex}>
               <slot name="result" {option}>{typeof option === 'string' ? option : option[displayField]}</slot>
