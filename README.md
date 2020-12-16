@@ -92,6 +92,18 @@ The modal and overlay will both animate in and out. These animations are not (ye
 | `deferStateChangeOnClose` | `bool` | Used for conditionally rendering the modal itself. See below |
 | `modalKey` | `string` | Used for conditionally rendering the modal itself. See below |
 
+The Modal also has a `closeModal` method you can bind to, and call as needed.
+
+```svelte
+{#if open3a}
+  <Modal modalKey="modal3a" open={true} deferStateChangeOnClose={true} bind:closeModal={closeModal3a} on:close={() => (open3a = false)}>
+    <button on:click={closeModal3a}>Close</button>
+  </Modal>
+{/if}
+```
+
+This can be used whether conditionally rendering, or not. 
+
 ### Conditional Rendering
 
 If you need to conditionally render the modal, ie something like this
@@ -112,13 +124,14 @@ Pass `true` to the `deferStateChangeOnClose` prop. Doing this will cause the clo
 
 If you need to imperatively close a modal that's conditionally rendered, pass it a `modalKey`, and import the `closeModal` method, like above, then call `closeModal` and pass in your key. This is only for modal's that are conditionally rendered, and is a workaround that'll go away once Svelte gets portals.
 
+
 ### Context
 
 Within a modal there is a `svelte-helpers-modal` context value that's an object, with the following properties 
 
 | Prop                 | Type | Description |
 | -------------------- | ------------------------------ | ------------|
-| `onClose`            | `function`       | Closes the current modal. Can be used regardless of whether the modal is conditionally rendered. |
+| `closeModal`            | `function`       | Closes the current modal. Can be used regardless of whether the modal is conditionally rendered. |
 | `isAnimatingResizing` | `writable<bool>`   | Writable store of a boolean value, that controls whether changes to the modal's dimensions are animated. This defaults to true, or whatever you pass to `animateResizing`, but can be changed any time. For example, you might flip it to false while running your own animations in the modal's content, and revert it to true when finished. |
 
 ### Style Overrides

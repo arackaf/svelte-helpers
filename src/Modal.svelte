@@ -9,7 +9,7 @@
   export let deferStateChangeOnClose = false;
   export let modalKey = "";
   export let animateResizing = true;
-  
+
   const dispatch = createEventDispatcher();
   let onClose = () => {
     dispatch("close");
@@ -24,8 +24,16 @@
     currentlyOpen = false;
     modalState.update(state => ({ ...state, modals: state.modals.filter(d => d.node != contentNode) }));
   };
+  export let closeModal;
+  closeModal = () => {
+    if (deferStateChangeOnClose) {
+      closeIt();
+    } else {
+      onClose();
+    }
+  };
 
-  setContext("svelte-helpers-modal", { isAnimatingResizing, onClose: deferStateChangeOnClose ? closeIt : onClose });
+  setContext("svelte-helpers-modal", { isAnimatingResizing, closeModal });
 
   onMount(() => {
     sync();

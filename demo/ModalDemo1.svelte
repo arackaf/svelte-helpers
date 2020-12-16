@@ -7,7 +7,7 @@
   let heightSpring = spring(0, { stiffness: 0.1, damping: 0.1, precision: 0.01 });
   //let heightSpring = spring(0, { stiffness: 0.9, damping: 0.9, precision: 0.01 });
   // let heightSpring = spring(0, { stiffness: 0.1, damping: 0.5, precision: 0.01 });
-  let { isAnimatingResizing, onClose } = getContext("svelte-helpers-modal");
+  let { isAnimatingResizing, closeModal } = getContext("svelte-helpers-modal");
 
   $: {
     let open = more;
@@ -33,7 +33,7 @@
 
   <input />
 
-  <button on:click={onClose}>Close</button>
+  <button on:click={closeModal}>Close</button>
 
   <div style="height: {$heightSpring}px; overflow: hidden">
     <p style="margin: 0">
