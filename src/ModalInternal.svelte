@@ -10,6 +10,19 @@
   export let isAnimatingResizing;
   export let onHide;
 
+  let modalContentNode;
+
+  onMount(() => {
+    function trap(evt) {
+      evt.stopPropagation();
+    }
+    modalContentNode.addEventListener("click", trap);
+
+    return () => {
+      modalContentNode.removeEventListener("click", trap);
+    };
+  });
+
   const OPEN_SPRING = { stiffness: 0.1, damping: 0.35, precision: 0.01 };
   const CLOSE_SPRING = { stiffness: 0.1, damping: 0.5, precision: 0.01 };
   // const DIMENSIONS_SPRING = { stiffness: 0.1, damping: 0.5, precision: 0.01 };
@@ -104,7 +117,7 @@
 </style>
 
 <div class="modal" in:modalIn out:modalOut on:outroend={onHidden} bind:this={root}>
-  <div class="svelte-helpers-modal-content" class:content-width={useContentWidth} style={dimensionStyles}>
+  <div bind:this={modalContentNode} class="svelte-helpers-modal-content" class:content-width={useContentWidth} style={dimensionStyles}>
     <div bind:this={innerContent}>
       <slot />
     </div>

@@ -31,6 +31,8 @@
 
   <br />
 
+  <input />
+
   <button on:click={onClose}>Close</button>
 
   <div style="height: {$heightSpring}px; overflow: hidden">

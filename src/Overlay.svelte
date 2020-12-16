@@ -3,23 +3,18 @@
   import { fade } from "svelte/transition";
 
   export let onClose = () => {};
-  export let modalNode;
-  
-  function overLayClicked(evt) {
-    const modalRoot = modalNode.parentNode.parentNode;
-    let target = evt.target;
-    if (!document.body.contains(target)) {
-      //clicked on something that no longer exists - assume it was something on the modal that's been removed
-      return;
-    }
-    do {
-      if (target == modalRoot) return;
-    } while ((target = target.parentNode));
 
-    onClose();
+  let mouseDownNode;
+
+  function overLayClicked(evt) {
+    if (evt.target == mouseDownNode || mouseDownNode.parentNode === evt.target) {
+      onClose();
+    }
   }
 
-
+  function overlayMouseDown(evt) {
+    mouseDownNode = evt.target;
+  }
 </script>
 
 <style>
@@ -35,6 +30,6 @@
   }
 </style>
 
-<div transition:fade={{ duration: 250, easing: quadOut }} class="svelte-modal-overlay" on:click={overLayClicked}>
+<div transition:fade={{ duration: 250, easing: quadOut }} class="svelte-modal-overlay" on:click={overLayClicked} on:mousedown={overlayMouseDown}>
   <slot />
 </div>
