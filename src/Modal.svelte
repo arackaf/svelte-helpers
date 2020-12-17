@@ -1,5 +1,5 @@
 <script>
-  import { onMount, afterUpdate, setContext, createEventDispatcher } from "svelte";
+  import { tick, onMount, afterUpdate, setContext, createEventDispatcher } from "svelte";
   import { writable } from "svelte/store";
   import modalState from "./modalState";
   import "./modalInit";
@@ -27,7 +27,7 @@
   export let closeModal;
   closeModal = () => {
     if (deferStateChangeOnClose) {
-      closeIt();
+      tick().then(closeIt);
     } else {
       onClose();
     }

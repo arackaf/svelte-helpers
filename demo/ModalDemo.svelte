@@ -20,6 +20,7 @@
 
   let closeModal3a;
   let closeModal1a;
+  let counter = 0;
 
 </script>
 
@@ -30,6 +31,8 @@
 <button on:click={button3}>Open3 (auto close)</button>
 <button on:click={() => (open4 = true)}>Open4 - no animate resizing</button>
 <button on:click={() => (open5 = true)}>Open Nested Modal</button>
+
+{counter}
 
 <Modal {open} bind:closeModal={closeModal1a} on:close={() => open = false}>
   <ModalDemo1 />
@@ -51,7 +54,8 @@
   <Modal modalKey="modal3a" open={true} deferStateChangeOnClose={true} bind:closeModal={closeModal3a} on:close={() => (open3a = false)} useContentWidth={true}>
     <ModalDemo2 />
     <hr />
-    <button on:click={closeModal3a}>Close 2</button>
+    <button on:click={() => { counter++; closeModal3a(); }}>Close 2</button>
+    <button on:click={() => { closeModal3a(); counter++; }}>Close 2a</button>
     <button on:click={() => open3a = false}>Nuke</button>
   </Modal>
 {/if}
