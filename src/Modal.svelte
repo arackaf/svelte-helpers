@@ -1,7 +1,7 @@
 <script>
-  import { tick, onMount, afterUpdate, setContext, createEventDispatcher } from "svelte";
+  import { onMount, afterUpdate, setContext, createEventDispatcher } from "svelte";
   import { writable } from "svelte/store";
-  import modalState from "./modalState";
+  import { renderModal, unRenderModal, blockModal, releaseModal } from "./modalState";
   import "./modalInit";
 
   export let open = false;
@@ -12,6 +12,7 @@
 
   const dispatch = createEventDispatcher();
   let onClose = () => {
+    releaseModal(contentNode);
     dispatch("close");
   };
 
@@ -22,12 +23,13 @@
 
   let closeIt = () => {
     currentlyOpen = false;
-    modalState.update(state => ({ ...state, modals: state.modals.filter(d => d.node != contentNode) }));
+    unRenderModal(contentNode);
   };
   export let closeModal;
   closeModal = () => {
     if (deferStateChangeOnClose) {
-      tick().then(closeIt);
+      blockModal(contentNode);
+      closeIt();
     } else {
       onClose();
     }
@@ -53,7 +55,7 @@
         props.onClose = closeIt;
         props.onHide = onClose;
       }
-      modalState.update(state => ({ ...state, modals: [...state.modals, props] }));
+      renderModal(props);
     } else if (currentlyOpen && !open) {
       closeIt();
     }
