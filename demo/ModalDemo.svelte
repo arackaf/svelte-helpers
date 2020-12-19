@@ -4,6 +4,7 @@
   import ModalDemo2 from "./ModalDemo2.svelte";
 
   let open = false;
+  let openSecond = false;
   let open2 = false;
   let open3 = false;
   let open3a = false;
@@ -22,6 +23,7 @@
   let closeModal1a;
   let counter = 0;
 
+  let closeSecond;
 </script>
 
 <button on:click={() => (open = true)}>Open</button>
@@ -34,7 +36,11 @@
 
 {counter}
 
-<Modal {open} bind:closeModal={closeModal1a} on:close={() => open = false}>
+{#if openSecond}
+  <Modal open={openSecond} deferStateChangeOnClose={true} bind:closeModal={closeSecond} on:close={() => (openSecond = false)}>AYYYYYYYYYYYYYYYY</Modal>
+{/if}
+
+<Modal {open} bind:closeModal={closeModal1a} on:close={() => (open = false)}>
   <ModalDemo1 />
   <hr />
   <button on:click={closeModal1a}>Close</button>
@@ -51,12 +57,31 @@
 {/if}
 
 {#if open3a}
-  <Modal modalKey="modal3a" open={true} deferStateChangeOnClose={true} bind:closeModal={closeModal3a} on:close={() => (open3a = false)} useContentWidth={true}>
+  <Modal
+    modalKey="modal3a"
+    open={true}
+    deferStateChangeOnClose={true}
+    bind:closeModal={closeModal3a}
+    on:close={() => (open3a = false)}
+    useContentWidth={true}>
     <ModalDemo2 />
     <hr />
-    <button on:click={() => { counter++; closeModal3a(); }}>Close 2</button>
-    <button on:click={() => { closeModal3a(); counter++; }}>Close 2a</button>
-    <button on:click={() => open3a = false}>Nuke</button>
+    <button
+      on:click={() => {
+        counter++;
+        closeModal3a();
+      }}>Close 2</button>
+    <button
+      on:click={() => {
+        closeModal3a();
+        counter++;
+      }}>Close 2a</button>
+    <button on:click={() => (open3a = false)}>Nuke</button>
+    <button
+      on:click={() => {
+        closeModal3a();
+        openSecond = true;
+      }}>Close then open</button>
   </Modal>
 {/if}
 

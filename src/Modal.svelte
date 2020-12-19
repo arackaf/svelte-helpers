@@ -25,8 +25,7 @@
     currentlyOpen = false;
     unRenderModal(contentNode);
   };
-  export let closeModal;
-  closeModal = () => {
+  export const closeModal = () => {
     if (deferStateChangeOnClose) {
       blockModal(contentNode);
       closeIt();
