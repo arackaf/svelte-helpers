@@ -1,5 +1,5 @@
 <script>
-  import AutoSuggest from "../src/AutoSuggest.svelte";
+  import AutoSuggest from "../AutoSuggest.svelte";
 
   let options = [
     { name: "Adam" },

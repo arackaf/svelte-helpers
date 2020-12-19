@@ -1,8 +1,9 @@
 <script>
   import { onMount } from "svelte";
-  import escapeRegex from "escape-string-regexp";
   import { spring } from "svelte/motion";
   import { fade } from "svelte/transition";
+  
+  import escapeRegex from "escape-string-regexp";
 
   export let onItemSelected;
   export let onBlur;

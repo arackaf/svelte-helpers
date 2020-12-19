@@ -3,7 +3,7 @@
   import { spring } from "svelte/motion";
   import { expoOut, quintIn } from "svelte/easing";
 
-  import { springIn, springOut } from "./spring-transitions";
+  import { springIn, springOut } from "../spring-transitions";
 
   export let node;
   export let useContentWidth;

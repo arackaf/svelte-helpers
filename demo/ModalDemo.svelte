@@ -1,5 +1,5 @@
 <script>
-  import Modal, { closeModal } from "../src/modal";
+  import Modal from "../Modal.svelte";
   import ModalDemo1 from "./ModalDemo1.svelte";
   import ModalDemo2 from "./ModalDemo2.svelte";
 
@@ -14,9 +14,6 @@
 
   function button3() {
     open3 = true;
-    setTimeout(() => {
-      closeModal("modal3");
-    }, 2000);
   }
 
   let closeModal3a;

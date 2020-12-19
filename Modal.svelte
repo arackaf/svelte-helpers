@@ -1,8 +1,8 @@
 <script>
   import { onMount, afterUpdate, setContext, createEventDispatcher } from "svelte";
   import { writable } from "svelte/store";
-  import { renderModal, unRenderModal, blockModal, releaseModal } from "./modalState";
-  import "./modalInit";
+  import { renderModal, unRenderModal, blockModal, releaseModal } from "./src/modalState";
+  import "./src/modalInit";
 
   export let open = false;
   export let useContentWidth = false;
