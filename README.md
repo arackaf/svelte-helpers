@@ -110,11 +110,12 @@ If you need to conditionally render the modal, ie something like this
 
 ```svelte
 <script>
-  import Modal, { closeModal } from "svelte-helpers/Modal";
+  import Modal from "svelte-helpers/Modal.svelte";
+  let closeThisModal;
 </script>
 
 {#if open3}
-  <Modal modalKey="modal3" open={true} deferStateChangeOnClose={true} on:close={() => (open3 = false)} useContentWidth={true}>
+  <Modal modalKey="modal3" open={true} deferStateChangeOnClose={true} on:close={() => (open3 = false)} useContentWidth={true} bind:closeModal={closeThisModal}>
     <ModalDemo2 />
   </Modal>
 {/if}
@@ -122,8 +123,7 @@ If you need to conditionally render the modal, ie something like this
 
 Pass `true` to the `deferStateChangeOnClose` prop. Doing this will cause the close behavior of the modal to first run the standard exit animation, and then, once the modal is gone, fire the `close` event, to reset your state. 
 
-If you need to imperatively close a modal that's conditionally rendered, pass it a `modalKey`, and import the `closeModal` method, like above, then call `closeModal` and pass in your key. This is only for modal's that are conditionally rendered, and is a workaround that'll go away once Svelte gets portals.
-
+If you need to imperatively close a modal that's conditionally rendered, bind to the `closeModal` method, described above, or if inside a component rendered by the Modal, just grab the `closeModal` method from context, described below. If (and only if) conditionally rendering your modal, you need to use one of these two methods to close your modal imperatively. Do *not* just reset your state, since this will immediately unmount the modal's content, without the proper unmount animations.
 
 ### Context
 

@@ -1,12 +1,9 @@
 {
   "name": "svelte-helpers",
-  "version": "0.2.0-beta5",
+  "version": "0.2.0-beta7",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "build": "rollup -c",
-    "prepublishOnly": "rollup -c"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/arackaf/svelte-helpers.git"
