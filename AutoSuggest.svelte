@@ -181,6 +181,10 @@
     border-bottom-right-radius: 0;
   }
 
+  .options-root {
+    z-index: 1;
+  }
+
   .options-container {
     margin-top: calc(-1 * var(--svelte-helpers-auto-complete-border-width));
     border: var(--svelte-helpers-auto-complete-border-width) solid var(--svelte-helpers-auto-complete-border-color);
