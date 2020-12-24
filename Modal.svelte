@@ -16,6 +16,10 @@
     dispatch("close");
   };
 
+  const onModalMount = () => {
+    dispatch("mount");
+  };
+
   let contentNode;
   let currentlyOpen = false;
 
@@ -23,6 +27,7 @@
 
   let closeIt = () => {
     currentlyOpen = false;
+    dispatch("closing");
     unRenderModal(contentNode);
   };
   export const closeModal = () => {
@@ -49,7 +54,7 @@
   function sync() {
     if (!currentlyOpen && open) {
       currentlyOpen = true;
-      let props = { onClose, modalKey, node: contentNode, isAnimatingResizing, useContentWidth };
+      let props = { onClose, modalKey, node: contentNode, isAnimatingResizing, useContentWidth, onModalMount };
       if (deferStateChangeOnClose) {
         props.onClose = closeIt;
         props.onHide = onClose;
@@ -63,13 +68,13 @@
 
 <style>
   :global(.svelte-helpers-modal-content) {
-    --modal-width: 50vw;
+    --modal-width: 600px;
     --modal-content-padding: 2rem;
-    width: var(--modal-width);
+    max-width: var(--modal-width);
+    width: auto;
     margin: 10vh auto;
     background: white;
     outline: none;
-    max-width: 600px;
     border-radius: 5px;
     border: 2px solid darkblue;
     overflow: hidden;
@@ -86,32 +91,18 @@
     align-self: baseline;
   }
 
-  @media (max-width: 1000px) {
-    :global(.svelte-helpers-modal-content) {
-      --modal-width: 55vw;
-    }
-  }
   @media (max-width: 800px) {
     :global(.svelte-helpers-modal-content) {
-      --modal-width: 60vw;
+      --modal-width: 75vw;
     }
   }
-  @media (max-width: 650px) {
-    :global(.svelte-helpers-modal-content) {
-      --modal-width: 70vw;
-    }
-  }
+
   @media (max-width: 600px) {
-    :global(.svelte-helpers-modal-content) {
-      --modal-width: 80vw;
-      --modal-content-padding: 1rem;
-    }
-  }
-  @media (max-width: 550px) {
     :global(.svelte-helpers-modal-content) {
       --modal-width: 90vw;
     }
   }
+
   @media (max-width: 500px) {
     :global(.svelte-helpers-modal-content) {
       --modal-width: 95vw;

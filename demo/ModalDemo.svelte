@@ -21,6 +21,7 @@
   let counter = 0;
 
   let closeSecond;
+  let el;
 </script>
 
 <button on:click={() => (open = true)}>Open</button>
@@ -34,10 +35,13 @@
 {counter}
 
 {#if openSecond}
-  <Modal open={openSecond} deferStateChangeOnClose={true} bind:closeModal={closeSecond} on:close={() => (openSecond = false)}>AYYYYYYYYYYYYYYYY</Modal>
+  <Modal open={openSecond} deferStateChangeOnClose={true} bind:closeModal={closeSecond} on:close={() => (openSecond = false)}>
+    AYYYYYYYYYYYYYYYY
+  </Modal>
 {/if}
 
-<Modal {open} bind:closeModal={closeModal1a} on:close={() => (open = false)}>
+<Modal {open} bind:closeModal={closeModal1a} on:mount={() => el.focus()} on:close={() => (open = false)} on:closing={() => console.log('closing')}>
+  <input bind:this={el} />
   <ModalDemo1 />
   <hr />
   <button on:click={closeModal1a}>Close</button>
@@ -48,7 +52,13 @@
 </Modal>
 
 {#if open3}
-  <Modal modalKey="modal3" open={true} deferStateChangeOnClose={true} on:close={() => (open3 = false)} useContentWidth={true}>
+  <Modal
+    modalKey="modal3"
+    open={true}
+    deferStateChangeOnClose={true}
+    on:close={() => (open3 = false)}
+    on:closing={() => console.log('closing')}
+    useContentWidth={true}>
     <ModalDemo2 />
   </Modal>
 {/if}

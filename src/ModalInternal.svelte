@@ -9,19 +9,10 @@
   export let useContentWidth;
   export let isAnimatingResizing;
   export let onHide;
+  export let onModalClosing;
+  export let onModalMount;
 
   let modalContentNode;
-
-  onMount(() => {
-    function trap(evt) {
-      evt.stopPropagation();
-    }
-    modalContentNode.addEventListener("click", trap);
-
-    return () => {
-      modalContentNode.removeEventListener("click", trap);
-    };
-  });
 
   const OPEN_SPRING = { stiffness: 0.1, damping: 0.35, precision: 0.01 };
   const CLOSE_SPRING = { stiffness: 0.1, damping: 0.5, precision: 0.01 };
@@ -67,9 +58,18 @@
   });
 
   onMount(() => {
+    function trap(evt) {
+      evt.stopPropagation();
+    }
+    modalContentNode.addEventListener("click", trap);
+
     innerContent.appendChild(node);
     ro.observe(innerContent);
+
+    onModalMount && onModalMount();
+    
     return () => {
+      modalContentNode.removeEventListener("click", trap);
       ro.unobserve(innerContent);
     };
   });
@@ -118,8 +118,6 @@
 
 <div class="modal" in:modalIn out:modalOut on:outroend={onHidden} bind:this={root}>
   <div bind:this={modalContentNode} class="svelte-helpers-modal-content" class:content-width={useContentWidth} style={dimensionStyles}>
-    <div bind:this={innerContent}>
-      <slot />
-    </div>
+    <div bind:this={innerContent} />
   </div>
 </div>
