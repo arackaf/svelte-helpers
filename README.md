@@ -92,6 +92,14 @@ The modal and overlay will both animate in and out. These animations are not (ye
 | `deferStateChangeOnClose` | `bool` | Used for conditionally rendering the modal itself. See below |
 | `modalKey` | `string` | Used for conditionally rendering the modal itself. See below |
 
+### Events
+
+| Name                 | Purpose |
+| -------------------- | ------------------------------ | ------------|
+| `on:close`            | The modal has been closed. Use this method to set whatever state to reflect this closed state |
+| `on:closing`            | The modal's closing animation has started. |
+| `on:mount`            | The open modal's content has been mounted in the dom. Use this event to focus an input, etc |
+
 The Modal also has a `closeModal` method you can bind to, and call as needed.
 
 ```svelte
@@ -102,7 +110,7 @@ The Modal also has a `closeModal` method you can bind to, and call as needed.
 {/if}
 ```
 
-This can be used whether conditionally rendering, or not. 
+This can be used whether conditionally rendering (explained below), or not. 
 
 ### Conditional Rendering
 
