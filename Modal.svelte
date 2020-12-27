@@ -30,6 +30,10 @@
     dispatch("closing");
     unRenderModal(contentNode);
   };
+  
+  let onClosed = () => {
+    dispatch("closed");
+  }
   export const closeModal = () => {
     if (deferStateChangeOnClose) {
       blockModal(contentNode);
@@ -54,7 +58,7 @@
   function sync() {
     if (!currentlyOpen && open) {
       currentlyOpen = true;
-      let props = { onClose, modalKey, node: contentNode, isAnimatingResizing, useContentWidth, onModalMount };
+      let props = { onClose, onClosed, modalKey, node: contentNode, isAnimatingResizing, useContentWidth, onModalMount };
       if (deferStateChangeOnClose) {
         props.onClose = closeIt;
         props.onHide = onClose;

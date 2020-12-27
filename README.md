@@ -98,6 +98,7 @@ The modal and overlay will both animate in and out. These animations are not (ye
 | -------------------- | ------------------------------ | ------------|
 | `on:close`            | The modal has been closed. Use this method to set whatever state to reflect this closed state |
 | `on:closing`            | The modal's closing animation has started. |
+| `on:closed`            | The modal's closing animation has completed. |
 | `on:mount`            | The open modal's content has been mounted in the dom. Use this event to focus an input, etc |
 
 The Modal also has a `closeModal` method you can bind to, and call as needed.

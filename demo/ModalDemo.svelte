@@ -40,7 +40,7 @@
   </Modal>
 {/if}
 
-<Modal {open} bind:closeModal={closeModal1a} on:mount={() => el.focus()} on:close={() => (open = false)} on:closing={() => console.log('closing')}>
+<Modal {open} bind:closeModal={closeModal1a} on:mount={() => el.focus()} on:close={() => (open = false)} on:closing={() => console.log('closing')} on:closed={() => console.log("closed")}>
   <input bind:this={el} />
   <ModalDemo1 />
   <hr />

@@ -9,7 +9,7 @@
   export let useContentWidth;
   export let isAnimatingResizing;
   export let onHide;
-  export let onModalClosing;
+  export let onClosed;
   export let onModalMount;
 
   let modalContentNode;
@@ -77,6 +77,7 @@
   function onHidden() {
     hasInitialSize = false;
     onHide && onHide();
+    onClosed();
   }
 
   function modalIn() {
