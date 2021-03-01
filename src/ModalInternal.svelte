@@ -1,7 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { spring } from "svelte/motion";
-  import { expoOut, quintIn } from "svelte/easing";
+  import { expoOut, quintIn, quadOut } from "svelte/easing";
 
   import { springIn, springOut } from "../spring-transitions";
 
@@ -14,13 +14,12 @@
 
   let modalContentNode;
 
-  const OPEN_SPRING = { stiffness: 0.1, damping: 0.35, precision: 0.01 };
+  const OPEN_SPRING = { stiffness: 0.1, damping: 0.4, precision: 0.01 };
   const CLOSE_SPRING = { stiffness: 0.1, damping: 0.5, precision: 0.01 };
   // const DIMENSIONS_SPRING = { stiffness: 0.1, damping: 0.5, precision: 0.01 };
   const DIMENSIONS_SPRING = { stiffness: 0.2, damping: 0.6, precision: 0.01 };
 
   const { tickToValue: modalSpringIn, duration: springInDuration } = springIn(-30, 0, OPEN_SPRING);
-
   const { tickToValue: modalSpringOut, duration: springOutDuration } = springOut(0, 30, CLOSE_SPRING);
 
   let root;
