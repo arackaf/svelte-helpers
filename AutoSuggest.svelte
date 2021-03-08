@@ -2,7 +2,7 @@
   import { onMount } from "svelte";
   import { spring } from "svelte/motion";
   import { fade } from "svelte/transition";
-  
+
   import escapeRegex from "escape-string-regexp";
 
   export let onItemSelected;
@@ -62,25 +62,41 @@
   let animateContainerHeight = false;
   const slideInSpring = spring({ height: 0, width: 0 }, { stiffness: 0.2, damping: 0.7 });
 
-  function setSpringDimensions(hard) {
+  $: console.log("changing", $slideInSpring);
+
+  function setSpringDimensions(hard, opening) {
     let maxHeightVar = getComputedStyle(document.documentElement).getPropertyValue("--svelte-helpers-auto-complete-results-max-height");
     let maxHeight = parseInt(maxHeightVar, 10);
 
-    slideInSpring.set(
-      { height: Math.min(resultsList.offsetHeight, maxHeight), width: Math.max(resultsList.offsetWidth, inputEl.clientWidth) },
-      hard ? { hard: true } : void 0
-    );
+    console.log("A", resultsList.offsetHeight, Math.min(resultsList.offsetHeight, maxHeight));
+
+    let width = Math.max(resultsList.offsetWidth, inputEl.clientWidth);
+    let height = Math.min(resultsList.offsetHeight, maxHeight);
+
+    console.log("B", { width, height })
+
+    if (opening) {
+      slideInSpring.set({ width, height: 0 }, { hard: true });
+      slideInSpring.set({ width, height });
+    } else {
+      slideInSpring.set({ height, width }, hard ? { hard: true } : void 0);
+    }
   }
 
-  let itemsHeightObserver = new ResizeObserver(() => setSpringDimensions());
+  let itemsHeightObserver = new ResizeObserver(() => {
+    /*setSpringDimensions()*/
+  });
   let inputWidthObserver = new ResizeObserver(() => {
     inputWidth = inputEl.clientWidth;
   });
   let resultsList;
 
-  function opening() {}
+  function opening() {
+    console.log("opening");
+    setSpringDimensions(false, true);
+  }
   function opened() {
-    setSpringDimensions(true);
+    //setSpringDimensions(true);
 
     animateContainerHeight = true;
     itemsHeightObserver.observe(resultsList);
@@ -148,6 +164,59 @@
   });
 </script>
 
+<svelte:window on:keydown={keyDown} />
+
+<div class="root" class:open>
+  <input
+    {placeholder}
+    bind:this={inputEl}
+    bind:value={currentSearch}
+    on:input={inputChanged}
+    on:click={inputEngaged}
+    on:focus={inputEngaged}
+    on:blur={inputBlurred}
+    class:open
+    style={inputStyles}
+    {...inputProps}
+  />
+  {#if open}
+    <div
+      class="options-root"
+      transition:fade={{ duration: 1 }}
+      on:introstart={opening}
+      on:introend={opened}
+      on:outrostart={closing}
+      on:outroend={closed}
+    >
+      <div
+        style="height: {animateContainerHeight || 1 ? $slideInSpring.height + 'px' : 'auto'}; width: {animateContainerHeight
+          ? $slideInSpring.width + 'px'
+          : 'auto'}"
+        class="options-container"
+      >
+        <ul bind:this={resultsList} style="min-width: {inputWidth}px">
+          {#each filteredOptions as option, index}
+            <li
+              on:click={() => onSelect(option)}
+              on:mousemove={() => highlightItem(index)}
+              on:mouseleave={() => unhighlightItem(index)}
+              on:mousedown={evt => evt.preventDefault()}
+              class="result"
+              class:selected={index == selectedIndex}
+            >
+              <slot name="result" {option}>{typeof option === "string" ? option : option[displayField]}</slot>
+            </li>
+          {:else}
+            <li>
+              <slot name="no-results">No results</slot>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    </div>
+  {/if}
+</div>
+
 <style>
   :root {
     --svelte-helpers-auto-complete-border-color: lightgray;
@@ -167,7 +236,7 @@
 
   .root * {
     box-sizing: content-box;
-	}
+  }
 
   input {
     border: var(--svelte-helpers-auto-complete-border-width) solid var(--svelte-helpers-auto-complete-border-color);
@@ -218,50 +287,3 @@
     background-color: var(--svelte-helpers-auto-complete-option-hover-background);
   }
 </style>
-
-<svelte:window on:keydown={keyDown} />
-
-<div class="root" class:open>
-  <input
-    {placeholder}
-    bind:this={inputEl}
-    bind:value={currentSearch}
-    on:input={inputChanged}
-    on:click={inputEngaged}
-    on:focus={inputEngaged}
-    on:blur={inputBlurred}
-    class:open
-    style={inputStyles}
-    {...inputProps} />
-  {#if open}
-    <div
-      transition:fade={{ duration: 150 }}
-      class="options-root"
-      on:introstart={opening}
-      on:introend={opened}
-      on:outrostart={closing}
-      on:outroend={closed}>
-      <div
-        style="height: {animateContainerHeight ? $slideInSpring.height + 'px' : 'auto'}; width: {animateContainerHeight ? $slideInSpring.width + 'px' : 'auto'}"
-        class="options-container">
-        <ul bind:this={resultsList} style="min-width: {inputWidth}px">
-          {#each filteredOptions as option, index}
-            <li
-              on:click={() => onSelect(option)}
-              on:mousemove={() => highlightItem(index)}
-              on:mouseleave={() => unhighlightItem(index)}
-              on:mousedown={evt => evt.preventDefault()}
-              class="result"
-              class:selected={index == selectedIndex}>
-              <slot name="result" {option}>{typeof option === 'string' ? option : option[displayField]}</slot>
-            </li>
-          {:else}
-            <li>
-              <slot name="no-results">No results</slot>
-            </li>
-          {/each}
-        </ul>
-      </div>
-    </div>
-  {/if}
-</div>
