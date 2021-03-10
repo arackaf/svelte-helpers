@@ -17,15 +17,22 @@
   export let inputProps = {};
 
   let open = false;
+  let resultsListVisible = false;
+  let resultsListHasRendered = false;
   let inputEl = null;
   let inputWidth;
   let filteredOptions = options;
   let selectedIndex = null;
   let focused = false;
+  let closing = false;
 
-  function inputEngaged() {
+  function inputEngaged(evt) {
+    if (closing) {
+      setSpringDimensions();
+    }
     open = true;
     focused = true;
+    resultsListVisible = true;
   }
 
   function inputChanged() {
@@ -35,9 +42,11 @@
   }
 
   function inputBlurred() {
+    closing = true;
     open = false;
     focused = false;
     onBlur && onBlur();
+    setSpringDimensions(false, true);
   }
 
   function filterOptions(options) {
@@ -59,53 +68,48 @@
     }
   }
 
-  let animateContainerHeight = false;
-  const slideInSpring = spring({ height: 0, width: 0 }, { stiffness: 0.2, damping: 0.7 });
+  const SLIDE_OPEN = { stiffness: 0.2, damping: 0.7 };
+  const SLIDE_CLOSE = { stiffness: 0.2, damping: 0.7 };
+  const slideInSpring = spring({ height: 0, width: 0 });
+  const opacitySpring = spring(1, { stiffness: 0.3, damping: 0.7 });
 
-  $: console.log("changing", $slideInSpring);
-
-  function setSpringDimensions(hard, opening) {
+  function setSpringDimensions(opening, closing) {
     let maxHeightVar = getComputedStyle(document.documentElement).getPropertyValue("--svelte-helpers-auto-complete-results-max-height");
     let maxHeight = parseInt(maxHeightVar, 10);
-
-    console.log("A", resultsList.offsetHeight, Math.min(resultsList.offsetHeight, maxHeight));
 
     let width = Math.max(resultsList.offsetWidth, inputEl.clientWidth);
     let height = Math.min(resultsList.offsetHeight, maxHeight);
 
-    console.log("B", { width, height })
-
     if (opening) {
+      opacitySpring.set(1, { hard: true });
+      Object.assign(slideInSpring, SLIDE_OPEN);
       slideInSpring.set({ width, height: 0 }, { hard: true });
-      slideInSpring.set({ width, height });
+      slideInSpring.set({ width, height }).then(() => {
+        itemsHeightObserver.observe(resultsList);
+      });
+    } else if (closing) {
+      opacitySpring.set(0);
+      Object.assign(slideInSpring, SLIDE_CLOSE);
+      slideInSpring
+        .update(({ width }) => ({ height: 0, width }))
+        .then(() => {
+          resultsListVisible = false;
+        });
     } else {
-      slideInSpring.set({ height, width }, hard ? { hard: true } : void 0);
+      Object.assign(slideInSpring, SLIDE_OPEN);
+      slideInSpring.set({ height, width });
+      opacitySpring.set(1, { hard: true });
     }
   }
 
   let itemsHeightObserver = new ResizeObserver(() => {
-    /*setSpringDimensions()*/
+    setSpringDimensions();
   });
+
   let inputWidthObserver = new ResizeObserver(() => {
     inputWidth = inputEl.clientWidth;
   });
   let resultsList;
-
-  function opening() {
-    console.log("opening");
-    setSpringDimensions(false, true);
-  }
-  function opened() {
-    //setSpringDimensions(true);
-
-    animateContainerHeight = true;
-    itemsHeightObserver.observe(resultsList);
-  }
-  function closing() {
-    itemsHeightObserver.unobserve(resultsList);
-    animateContainerHeight = false;
-  }
-  function closed() {}
 
   function highlightItem(index) {
     index !== selectedIndex && (selectedIndex = index);
@@ -162,6 +166,19 @@
       inputWidthObserver.unobserve(inputEl);
     };
   });
+
+  function resultsListRendered(node) {
+    resultsList = node;
+    setSpringDimensions(true);
+    resultsListHasRendered = true;
+
+    return {
+      destroy() {
+        resultsListHasRendered = false;
+        closing = false;
+      }
+    };
+  }
 </script>
 
 <svelte:window on:keydown={keyDown} />
@@ -179,22 +196,10 @@
     style={inputStyles}
     {...inputProps}
   />
-  {#if open}
-    <div
-      class="options-root"
-      transition:fade={{ duration: 1 }}
-      on:introstart={opening}
-      on:introend={opened}
-      on:outrostart={closing}
-      on:outroend={closed}
-    >
-      <div
-        style="height: {animateContainerHeight || 1 ? $slideInSpring.height + 'px' : 'auto'}; width: {animateContainerHeight
-          ? $slideInSpring.width + 'px'
-          : 'auto'}"
-        class="options-container"
-      >
-        <ul bind:this={resultsList} style="min-width: {inputWidth}px">
+  {#if resultsListVisible}
+    <div class="options-root">
+      <div style="height: {$slideInSpring.height + 'px'}; width: {$slideInSpring.width + 'px'}; opacity: {$opacitySpring}" class="options-container">
+        <ul use:resultsListRendered style="min-width: {inputWidth}px">
           {#each filteredOptions as option, index}
             <li
               on:click={() => onSelect(option)}
