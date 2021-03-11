@@ -1,9 +1,9 @@
 <script>
   import { onMount } from "svelte";
   import { spring } from "svelte/motion";
-  import { fade } from "svelte/transition";
 
   import escapeRegex from "escape-string-regexp";
+  import { createMachine, interpret } from "@xstate/fsm";
 
   export let onItemSelected;
   export let onBlur;
@@ -16,6 +16,48 @@
   export let currentSearch = "";
   export let inputProps = {};
 
+  const stateMachine = createMachine(
+    {
+      initial: "closed",
+      states: {
+        closed: { on: { OPEN: "opening" }, entry: "closed" },
+        opening: { on: { OPENED: "open", actions: "opened" }, entry: "opening" },
+        open: {
+          on: {
+            CLOSE: "closing",
+            RESIZE: { target: "open", actions: "resize" }
+          },
+        },
+        closing: { on: { CLOSED: "closed" }, entry: "closing" }
+      }
+    },
+    {
+      actions: {
+        closed() {
+          console.log("closed");
+        },
+        opening() {
+          console.log("opening");
+        },
+        opened() {
+          console.log("opened");
+        },
+        closing() {
+          console.log("closing");
+        },
+        resize() {
+          console.log("resize");
+        }
+      }
+    }
+  );
+
+  const stateMachineService = interpret(stateMachine).start();
+
+  stateMachineService.subscribe(state => {
+    console.log("state", state.value);
+  });
+
   let open = false;
   let resultsListVisible = false;
   let resultsListHasRendered = false;
@@ -27,6 +69,11 @@
   let closing = false;
 
   function inputEngaged(evt) {
+    stateMachineService.send("OPEN");
+    setTimeout(() => {
+      stateMachineService.send("OPENED");
+    }, 2000);
+
     if (closing) {
       setSpringDimensions();
     }
@@ -103,6 +150,7 @@
   }
 
   let itemsHeightObserver = new ResizeObserver(() => {
+    stateMachineService.send("RESIZE");
     setSpringDimensions();
   });
 
