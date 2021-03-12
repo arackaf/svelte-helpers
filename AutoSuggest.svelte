@@ -18,25 +18,45 @@
   export let currentSearch = "";
   export let inputProps = {};
 
+  const SLIDE_OPEN = { stiffness: 0.2, damping: 0.7 };
+  const SLIDE_CLOSE = { stiffness: 0.3, damping: 0.7 };
+
   const stateMachine = createMachine(
     {
       initial: "closed",
       context: {
         open: false,
         rendered: false,
+        spring: {
+          config: SLIDE_OPEN,
+          dimensions: { width: 0, height: 0 }
+        },
         x: 12,
         y: 13
       },
       states: {
-        closed: { on: { OPEN: "opening" }, entry: "closed" },
-        opening: { on: { OPENED: "open", actions: "opened" }, entry: "opening" },
+        closed: {
+          on: { OPEN: "opening" },
+          entry: "closed"
+        },
+        opening: {
+          on: {
+            OPENED: { target: "open" },
+            RENDERED: { actions: "rendered" }
+          },
+          entry: "opening"
+        },
         open: {
           on: {
             CLOSE: "closing",
-            RESIZE: { target: "open", actions: "resize" }
-          }
+            RESIZE: { actions: "resize" }
+          },
+          entry: "opened"
         },
-        closing: { on: { CLOSED: "closed" }, entry: "closing" }
+        closing: {
+          on: { CLOSED: "closed" },
+          entry: "closing"
+        }
       }
     },
     {
@@ -47,6 +67,11 @@
         opening: assign(context => {
           console.log("ACTION", context, "opening");
           return { ...context, open: true };
+        }),
+        rendered: assign((context, evt) => {
+          console.log("ACTION", context, "rendered", evt);
+          slideInSpring.update(prev => ({ ...prev, width: evt.dimensions.width }), { hard: true });
+          return { ...context, spring: { dimensions: evt.dimensions, config: SLIDE_OPEN } };
         }),
         opened(context) {
           console.log("ACTION", context, "opened");
@@ -64,6 +89,13 @@
   const stateMachineService = interpret(stateMachine).start();
 
   $: currentState = $stateMachineService.context;
+  $: springInfo = currentState.spring;
+
+  $: {
+    let newSpringInfo = springInfo;
+    Object.assign(slideInSpring, newSpringInfo.config);
+    slideInSpring.set(newSpringInfo.dimensions);
+  }
 
   $: {
     let open = currentState.open;
@@ -76,7 +108,6 @@
 
   let open = false;
   let resultsListVisible = false;
-  let resultsListHasRendered = false;
   let inputEl = null;
   let inputWidth;
   let filteredOptions = options;
@@ -131,10 +162,18 @@
     }
   }
 
-  const SLIDE_OPEN = { stiffness: 0.2, damping: 0.7 };
-  const SLIDE_CLOSE = { stiffness: 0.2, damping: 0.7 };
   const slideInSpring = spring({ height: 0, width: 0 });
   const opacitySpring = spring(1, { stiffness: 0.3, damping: 0.7 });
+
+  function getResultsListDimensions() {
+    let maxHeightVar = getComputedStyle(document.documentElement).getPropertyValue("--svelte-helpers-auto-complete-results-max-height");
+    let maxHeight = parseInt(maxHeightVar, 10);
+
+    let width = Math.max(resultsList.offsetWidth, inputEl.clientWidth);
+    let height = Math.min(resultsList.offsetHeight, maxHeight);
+
+    return { width, height };
+  }
 
   function setSpringDimensions(opening, closing) {
     let maxHeightVar = getComputedStyle(document.documentElement).getPropertyValue("--svelte-helpers-auto-complete-results-max-height");
@@ -234,12 +273,11 @@
 
   function resultsListRendered(node) {
     resultsList = node;
-    setSpringDimensions(true);
-    resultsListHasRendered = true;
+    stateMachineService.send({ type: "RENDERED", dimensions: getResultsListDimensions() });
+    //setSpringDimensions(true);
 
     return {
       destroy() {
-        resultsListHasRendered = false;
         closing = false;
       }
     };
