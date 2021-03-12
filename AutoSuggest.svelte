@@ -25,8 +25,7 @@
     {
       initial: "closed",
       context: {
-        open: false,
-        rendered: false
+        open: false
       },
       states: {
         closed: {
@@ -47,17 +46,17 @@
     },
     {
       actions: {
-        closed: assign(context => ({ open: false })),
+        closed: assign(() => ({ open: false })),
         opened: assign(context => {
           return { ...context, open: true };
         }),
-        rendered(context, evt) {
-          opacitySpring.set(0, { hard: true });
+        rendered(_, evt) {
+          opacitySpring.set(1, { hard: true });
           Object.assign(slideInSpring, SLIDE_OPEN);
           slideInSpring.update(prev => ({ ...prev, width: evt.dimensions.width }), { hard: true });
           slideInSpring.set(evt.dimensions, { hard: false });
         },
-        close(context) {
+        close() {
           opacitySpring.set(0);
           Object.assign(slideInSpring, SLIDE_CLOSE);
           slideInSpring.update(prev => ({ ...prev, height: 0 })).then(() => stateMachineService.send("CLOSED"));
@@ -65,28 +64,19 @@
         resize() {
           opacitySpring.set(1);
           slideInSpring.set(getResultsListDimensions());
-          //console.log("ACTION", context, "resize");
         }
       }
     }
   );
 
   const stateMachineService = interpret(stateMachine).start();
-
-  $: currentState = $stateMachineService.context;
-
-  $: ({ open, rendered } = currentState);
-
-  stateMachineService.subscribe((state, x) => {
-    console.log("state", state, state.value, x);
-  });
+  $: open = $stateMachineService.context.open;
 
   let inputEl = null;
   let inputWidth;
   let filteredOptions = options;
   let selectedIndex = null;
   let focused = false;
-  let closing = false;
 
   function inputEngaged(evt) {
     stateMachineService.send("OPEN");
@@ -103,11 +93,8 @@
 
   function inputBlurred() {
     stateMachineService.send("CLOSE");
-    //closing = true;
-    //open = false;
     focused = false;
     onBlur && onBlur();
-    //setSpringDimensions(false, true);
   }
 
   function filterOptions(options) {
@@ -142,31 +129,6 @@
     return { width, height };
   }
 
-  function setSpringDimensions(opening, closing) {
-    let maxHeightVar = getComputedStyle(document.documentElement).getPropertyValue("--svelte-helpers-auto-complete-results-max-height");
-    let maxHeight = parseInt(maxHeightVar, 10);
-
-    let width = Math.max(resultsList.offsetWidth, inputEl.clientWidth);
-    let height = Math.min(resultsList.offsetHeight, maxHeight);
-
-    if (opening) {
-      opacitySpring.set(1, { hard: true });
-      Object.assign(slideInSpring, SLIDE_OPEN);
-      slideInSpring.set({ width, height: 0 }, { hard: true });
-      slideInSpring.set({ width, height }).then(() => {
-        itemsHeightObserver.observe(resultsList);
-      });
-    } else if (closing) {
-      opacitySpring.set(0);
-      Object.assign(slideInSpring, SLIDE_CLOSE);
-      slideInSpring.update(({ width }) => ({ height: 0, width }));
-    } else {
-      Object.assign(slideInSpring, SLIDE_OPEN);
-      slideInSpring.set({ height, width });
-      opacitySpring.set(1, { hard: true });
-    }
-  }
-
   let itemsHeightObserver = new ResizeObserver(() => {
     stateMachineService.send("RESIZE");
   });
@@ -197,7 +159,6 @@
   }
 
   function keyDown(evt) {
-    //console.log(evt.keyCode);
     if (evt.keyCode == 27 && open) {
       open = false;
     } else if (!open && evt.keyCode == 40 && focused) {
@@ -237,7 +198,6 @@
     resultsList = node;
     stateMachineService.send({ type: "RENDERED", dimensions: getResultsListDimensions() });
     itemsHeightObserver.observe(resultsList);
-    //setSpringDimensions(true);
     
     return {
       destroy() {
