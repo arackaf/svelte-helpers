@@ -80,15 +80,12 @@
 
   function inputEngaged(evt) {
     stateMachineService.send("OPEN");
-
-    open = true;
+    
     focused = true;
   }
-
+  
   function inputChanged() {
-    if (!open) {
-      open = true;
-    }
+    stateMachineService.send("OPEN");
   }
 
   function inputBlurred() {
@@ -155,14 +152,14 @@
     } else {
       inputEl.value = option[displayField];
     }
-    open = false;
+    stateMachineService.send("CLOSE");
   }
 
   function keyDown(evt) {
     if (evt.keyCode == 27 && open) {
-      open = false;
+      stateMachineService.send("CLOSE");
     } else if (!open && evt.keyCode == 40 && focused) {
-      open = true;
+      stateMachineService.send("OPEN");
     } else if (open && filteredOptions.length) {
       if (evt.keyCode == 40) {
         if (selectedIndex == null) {
@@ -179,7 +176,6 @@
       } else if (evt.keyCode == 13) {
         if (selectedIndex != null) {
           onSelect(filteredOptions[selectedIndex]);
-          open = false;
         }
       }
     }
