@@ -35,15 +35,13 @@
         },
         open: {
           on: {
-            CLOSE: "closing",
             RENDERED: { actions: "rendered" },
-            RESIZE: { actions: "resize" }
+            RESIZE: { actions: "resize" },
+            CLOSE: { actions: "close" },
+            CLOSED: "closed",
+            OPEN: { actions: "resize" }
           },
           entry: "opened"
-        },
-        closing: {
-          on: { CLOSED: "closed" },
-          entry: "closing"
         }
       }
     },
@@ -54,15 +52,19 @@
           return { ...context, open: true };
         }),
         rendered(context, evt) {
+          opacitySpring.set(0, { hard: true });
           Object.assign(slideInSpring, SLIDE_OPEN);
           slideInSpring.update(prev => ({ ...prev, width: evt.dimensions.width }), { hard: true });
           slideInSpring.set(evt.dimensions, { hard: false });
         },
-        closing(context) {
-          //console.log("ACTION", context, "closing");
+        close(context) {
+          opacitySpring.set(0);
+          Object.assign(slideInSpring, SLIDE_CLOSE);
+          slideInSpring.update(prev => ({ ...prev, height: 0 })).then(() => stateMachineService.send("CLOSED"));
         },
-        resize(context, evt) {
-          slideInSpring.set(evt.dimensions);
+        resize() {
+          opacitySpring.set(1);
+          slideInSpring.set(getResultsListDimensions());
           //console.log("ACTION", context, "resize");
         }
       }
@@ -73,16 +75,12 @@
 
   $: currentState = $stateMachineService.context;
 
-  $: {
-    let open = currentState.open;
-  }
+  $: ({ open, rendered } = currentState);
 
   stateMachineService.subscribe((state, x) => {
-    //console.log("state", state, state.value, x);
+    console.log("state", state, state.value, x);
   });
 
-  let open = false;
-  let resultsListVisible = false;
   let inputEl = null;
   let inputWidth;
   let filteredOptions = options;
@@ -92,16 +90,9 @@
 
   function inputEngaged(evt) {
     stateMachineService.send("OPEN");
-    setTimeout(() => {
-      stateMachineService.send("OPENED");
-    }, 2000);
 
-    if (closing) {
-      setSpringDimensions();
-    }
     open = true;
     focused = true;
-    resultsListVisible = true;
   }
 
   function inputChanged() {
@@ -111,11 +102,12 @@
   }
 
   function inputBlurred() {
-    closing = true;
-    open = false;
+    stateMachineService.send("CLOSE");
+    //closing = true;
+    //open = false;
     focused = false;
     onBlur && onBlur();
-    setSpringDimensions(false, true);
+    //setSpringDimensions(false, true);
   }
 
   function filterOptions(options) {
@@ -167,11 +159,7 @@
     } else if (closing) {
       opacitySpring.set(0);
       Object.assign(slideInSpring, SLIDE_CLOSE);
-      slideInSpring
-        .update(({ width }) => ({ height: 0, width }))
-        .then(() => {
-          resultsListVisible = false;
-        });
+      slideInSpring.update(({ width }) => ({ height: 0, width }));
     } else {
       Object.assign(slideInSpring, SLIDE_OPEN);
       slideInSpring.set({ height, width });
@@ -180,7 +168,7 @@
   }
 
   let itemsHeightObserver = new ResizeObserver(() => {
-    stateMachineService.send({ type: "RESIZE", dimensions: getResultsListDimensions() });
+    stateMachineService.send("RESIZE");
   });
 
   let inputWidthObserver = new ResizeObserver(() => {
@@ -250,10 +238,10 @@
     stateMachineService.send({ type: "RENDERED", dimensions: getResultsListDimensions() });
     itemsHeightObserver.observe(resultsList);
     //setSpringDimensions(true);
-
+    
     return {
       destroy() {
-        closing = false;
+        itemsHeightObserver.unobserve(resultsList);
       }
     };
   }
@@ -274,7 +262,7 @@
     style={inputStyles}
     {...inputProps}
   />
-  {#if resultsListVisible}
+  {#if open}
     <div class="options-root">
       <div style="height: {$slideInSpring.height + 'px'}; width: {$slideInSpring.width + 'px'}; opacity: {$opacitySpring}" class="options-container">
         <ul use:resultsListRendered style="min-width: {inputWidth}px">
