@@ -29,7 +29,8 @@
         rendered: false,
         spring: {
           config: SLIDE_OPEN,
-          dimensions: { width: 0, height: 0 }
+          dimensions: { width: 0, height: 0 },
+          widthImmediate: false
         },
         x: 12,
         y: 13
@@ -70,8 +71,8 @@
         }),
         rendered: assign((context, evt) => {
           //console.log("ACTION", context, "rendered", evt);
-          slideInSpring.update(prev => ({ ...prev, width: evt.dimensions.width }), { hard: true });
-          return { ...context, spring: { dimensions: evt.dimensions, config: SLIDE_OPEN } };
+          //slideInSpring.update(prev => ({ ...prev, width: evt.dimensions.width }), { hard: true });
+          return { ...context, spring: { dimensions: evt.dimensions, config: SLIDE_OPEN, widthImmediate: true } };
         }),
         opened(context) {
           //console.log("ACTION", context, "opened");
@@ -94,6 +95,9 @@
   $: {
     let newSpringInfo = springInfo;
     Object.assign(slideInSpring, newSpringInfo.config);
+    if (newSpringInfo.widthImmediate) {
+      slideInSpring.update(old => ({ ...old, width: newSpringInfo.dimensions.width }), { hard: true });
+    }
     slideInSpring.set(newSpringInfo.dimensions);
   }
 
