@@ -30,29 +30,25 @@
         spring: {
           config: SLIDE_OPEN,
           dimensions: { width: 0, height: 0 },
-          widthImmediate: false
+          widthImmediate: false,
+          hard: false
         },
         x: 12,
         y: 13
       },
       states: {
         closed: {
-          on: { OPEN: "opening" },
-          entry: "closed"
-        },
-        opening: {
-          on: {
-            OPENED: { target: "open" },
-            RENDERED: { actions: "rendered" }
-          },
-          entry: "opening"
+          on: { OPEN: { actions: ["opened"], target: "open" } }
         },
         open: {
           on: {
-            CLOSE: "closing",
-            RESIZE: { actions: "resize" }
-          },
-          entry: "opened"
+            RENDERED: { actions: "rendered", target: "active" },
+            CLOSE: "closing"
+          }
+        },
+        active: {
+          //RENDERED: { actions: ["rendered"] },
+          entry: "activated"
         },
         closing: {
           on: { CLOSED: "closed" },
@@ -62,6 +58,7 @@
     },
     {
       actions: {
+        opened: assign(context => ({ ...context, open: true })),
         closed(context) {
           //console.log("ACTION", context, "closed");
         },
@@ -72,11 +69,21 @@
         rendered: assign((context, evt) => {
           //console.log("ACTION", context, "rendered", evt);
           //slideInSpring.update(prev => ({ ...prev, width: evt.dimensions.width }), { hard: true });
-          return { ...context, spring: { dimensions: evt.dimensions, config: SLIDE_OPEN, widthImmediate: true } };
+          console.log("___rendered___");
+          const prevDimensions = context.spring.dimensions;
+          return { ...context, spring: { dimensions: { width: evt.dimensions.width, height: prevDimensions.height }, config: SLIDE_OPEN, hard: true } };
         }),
-        opened(context) {
-          //console.log("ACTION", context, "opened");
-        },
+        activated: assign((context, evt) => {
+          console.log("___activated___");
+          return { ...context, spring: { dimensions: { ...getResultsListDimensions() }, config: SLIDE_OPEN, hard: false } };
+        }),
+        resized: assign((context, evt) => {
+          console.log("___resized___");
+          //console.log("ACTION", context, "rendered", evt);
+          //slideInSpring.update(prev => ({ ...prev, width: evt.dimensions.width }), { hard: true });
+          return { ...context, spring: { dimensions: evt.dimensions, config: SLIDE_OPEN, hard: false } };
+        }),
+
         closing(context) {
           //console.log("ACTION", context, "closing");
         },
@@ -89,16 +96,18 @@
 
   const stateMachineService = interpret(stateMachine).start();
 
+  // $: {
+  //   console.log("MACHINE CHANGE A", $stateMachineService);
+  // }
+
   $: currentState = $stateMachineService.context;
   $: springInfo = currentState.spring;
 
   $: {
     let newSpringInfo = springInfo;
+    console.log("state SPRING update", newSpringInfo);
     Object.assign(slideInSpring, newSpringInfo.config);
-    if (newSpringInfo.widthImmediate) {
-      slideInSpring.update(old => ({ ...old, width: newSpringInfo.dimensions.width }), { hard: true });
-    }
-    slideInSpring.set(newSpringInfo.dimensions);
+    slideInSpring.set(newSpringInfo.dimensions, { hard: newSpringInfo.hard });
   }
 
   $: {
@@ -106,7 +115,7 @@
   }
 
   stateMachineService.subscribe((state, x) => {
-    //console.log("state", state, state.value, x);
+    console.log("MACHINE CHANGE", state, state.value, x);
   });
 
   let open = false;
@@ -121,7 +130,7 @@
   function inputEngaged(evt) {
     stateMachineService.send("OPEN");
     setTimeout(() => {
-      stateMachineService.send("OPENED");
+      //stateMachineService.send("OPENED");
     }, 2000);
 
     if (closing) {
@@ -298,7 +307,7 @@
     bind:value={currentSearch}
     on:input={inputChanged}
     on:click={inputEngaged}
-    on:focus={inputEngaged}
+    on:focus={() => {}}
     on:blur={inputBlurred}
     class:open
     style={inputStyles}
