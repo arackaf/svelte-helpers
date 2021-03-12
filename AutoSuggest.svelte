@@ -62,25 +62,25 @@
     {
       actions: {
         closed(context) {
-          console.log("ACTION", context, "closed");
+          //console.log("ACTION", context, "closed");
         },
         opening: assign(context => {
-          console.log("ACTION", context, "opening");
+          //console.log("ACTION", context, "opening");
           return { ...context, open: true };
         }),
         rendered: assign((context, evt) => {
-          console.log("ACTION", context, "rendered", evt);
+          //console.log("ACTION", context, "rendered", evt);
           slideInSpring.update(prev => ({ ...prev, width: evt.dimensions.width }), { hard: true });
           return { ...context, spring: { dimensions: evt.dimensions, config: SLIDE_OPEN } };
         }),
         opened(context) {
-          console.log("ACTION", context, "opened");
+          //console.log("ACTION", context, "opened");
         },
         closing(context) {
-          console.log("ACTION", context, "closing");
+          //console.log("ACTION", context, "closing");
         },
         resize(context) {
-          console.log("ACTION", context, "resize");
+          //console.log("ACTION", context, "resize");
         }
       }
     }
@@ -99,11 +99,10 @@
 
   $: {
     let open = currentState.open;
-    console.log("OPEN CHANGED TO", open);
   }
 
   stateMachineService.subscribe((state, x) => {
-    console.log("state", state, state.value, x);
+    //console.log("state", state, state.value, x);
   });
 
   let open = false;
@@ -205,8 +204,9 @@
   }
 
   let itemsHeightObserver = new ResizeObserver(() => {
-    stateMachineService.send("RESIZE");
-    setSpringDimensions();
+    console.log("RESIZE", getResultsListDimensions());
+    //stateMachineService.send("RESIZE");
+    //setSpringDimensions();
   });
 
   let inputWidthObserver = new ResizeObserver(() => {
@@ -235,7 +235,7 @@
   }
 
   function keyDown(evt) {
-    console.log(evt.keyCode);
+    //console.log(evt.keyCode);
     if (evt.keyCode == 27 && open) {
       open = false;
     } else if (!open && evt.keyCode == 40 && focused) {
@@ -273,6 +273,7 @@
 
   function resultsListRendered(node) {
     resultsList = node;
+    itemsHeightObserver.observe(resultsList);
     stateMachineService.send({ type: "RENDERED", dimensions: getResultsListDimensions() });
     //setSpringDimensions(true);
 
