@@ -73,6 +73,7 @@
     </AutoSuggest>
   </div>
 
+  <!--
   <div>
     <h3>Object options</h3>
     <AutoSuggest filterField={'name'} displayField="name" placeholder="Search" {options}>
@@ -113,4 +114,6 @@
     Selected:
     {selectedBook}
   </div>
+  -->
+  
 </div>

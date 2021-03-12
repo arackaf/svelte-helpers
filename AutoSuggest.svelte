@@ -1,9 +1,11 @@
+<svelte:options immutable={true} />
+
 <script>
   import { onMount } from "svelte";
   import { spring } from "svelte/motion";
 
   import escapeRegex from "escape-string-regexp";
-  import { createMachine, interpret } from "@xstate/fsm";
+  import { createMachine, interpret, assign } from "@xstate/fsm";
 
   export let onItemSelected;
   export let onBlur;
@@ -19,6 +21,12 @@
   const stateMachine = createMachine(
     {
       initial: "closed",
+      context: {
+        open: false,
+        rendered: false,
+        x: 12,
+        y: 13
+      },
       states: {
         closed: { on: { OPEN: "opening" }, entry: "closed" },
         opening: { on: { OPENED: "open", actions: "opened" }, entry: "opening" },
@@ -26,27 +34,28 @@
           on: {
             CLOSE: "closing",
             RESIZE: { target: "open", actions: "resize" }
-          },
+          }
         },
         closing: { on: { CLOSED: "closed" }, entry: "closing" }
       }
     },
     {
       actions: {
-        closed() {
-          console.log("closed");
+        closed(context) {
+          console.log("ACTION", context, "closed");
         },
-        opening() {
-          console.log("opening");
+        opening: assign(context => {
+          console.log("ACTION", context, "opening");
+          return { ...context, open: true };
+        }),
+        opened(context) {
+          console.log("ACTION", context, "opened");
         },
-        opened() {
-          console.log("opened");
+        closing(context) {
+          console.log("ACTION", context, "closing");
         },
-        closing() {
-          console.log("closing");
-        },
-        resize() {
-          console.log("resize");
+        resize(context) {
+          console.log("ACTION", context, "resize");
         }
       }
     }
@@ -54,8 +63,15 @@
 
   const stateMachineService = interpret(stateMachine).start();
 
-  stateMachineService.subscribe(state => {
-    console.log("state", state.value);
+  $: currentState = $stateMachineService.context;
+
+  $: {
+    let open = currentState.open;
+    console.log("OPEN CHANGED TO", open);
+  }
+
+  stateMachineService.subscribe((state, x) => {
+    console.log("state", state, state.value, x);
   });
 
   let open = false;
@@ -180,6 +196,7 @@
   }
 
   function keyDown(evt) {
+    console.log(evt.keyCode);
     if (evt.keyCode == 27 && open) {
       open = false;
     } else if (!open && evt.keyCode == 40 && focused) {
