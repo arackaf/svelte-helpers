@@ -23,54 +23,84 @@
 
   const stateMachine = createMachine(
     {
-      initial: "closed",
+      initial: "initial",
       context: {
-        open: false
+        open: false,
+        node: null
       },
       states: {
-        closed: {
-          on: { OPEN: "open" },
-          entry: "closed"
+        initial: {
+          on: { OPEN: "open" }
         },
         open: {
           on: {
             RENDERED: { actions: "rendered" },
             RESIZE: { actions: "resize" },
-            CLOSE: { actions: "close" },
-            CLOSED: "closed",
-            OPEN: { actions: "resize" }
+            CLOSE: "closing"
           },
           entry: "opened"
+        },
+        closing: {
+          on: {
+            OPEN: { target: "open", actions: ["resize"] },
+            CLOSED: "closed"
+          },
+          entry: "close"
+        },
+        closed: {
+          on: {
+            OPEN: "open"
+          },
+          entry: "closed"
         }
       }
     },
     {
       actions: {
-        closed: assign(() => ({ open: false })),
         opened: assign(context => {
           return { ...context, open: true };
         }),
-        rendered(_, evt) {
+        rendered: assign((context, evt) => {
+          const { node } = evt;
+          const dimensions = getResultsListDimensions(node);
+          itemsHeightObserver.observe(node);
           opacitySpring.set(1, { hard: true });
           Object.assign(slideInSpring, SLIDE_OPEN);
-          slideInSpring.update(prev => ({ ...prev, width: evt.dimensions.width }), { hard: true });
-          slideInSpring.set(evt.dimensions, { hard: false });
-        },
+          slideInSpring.update(prev => ({ ...prev, width: dimensions.width }), { hard: true });
+          slideInSpring.set(dimensions, { hard: false });
+          return { ...context, node };
+        }),
         close() {
           opacitySpring.set(0);
           Object.assign(slideInSpring, SLIDE_CLOSE);
-          slideInSpring.update(prev => ({ ...prev, height: 0 })).then(() => stateMachineService.send("CLOSED"));
+          slideInSpring
+            .update(prev => ({ ...prev, height: 0 }))
+            .then(() => {
+              stateMachineService.send("CLOSED");
+            });
         },
-        resize() {
+        resize(context) {
           opacitySpring.set(1);
-          slideInSpring.set(getResultsListDimensions());
-        }
+          slideInSpring.set(getResultsListDimensions(context.node));
+        },
+        closed: assign(() => {
+          itemsHeightObserver.unobserve(resultsList);
+          return { open: false, node: null };
+        })
       }
     }
   );
 
+  let itemsHeightObserver = new ResizeObserver(() => {
+    stateMachineService.send("RESIZE");
+  });
+
+  let inputWidthObserver = new ResizeObserver(() => {
+    inputWidth = inputEl.clientWidth;
+  });
+
   const stateMachineService = interpret(stateMachine).start();
-  $: open = $stateMachineService.context.open;
+  $: ({ open, node: resultsList } = $stateMachineService.context);
 
   let inputEl = null;
   let inputWidth;
@@ -80,10 +110,10 @@
 
   function inputEngaged(evt) {
     stateMachineService.send("OPEN");
-    
+
     focused = true;
   }
-  
+
   function inputChanged() {
     stateMachineService.send("OPEN");
   }
@@ -116,24 +146,15 @@
   const slideInSpring = spring({ height: 0, width: 0 });
   const opacitySpring = spring(1, { stiffness: 0.3, damping: 0.7 });
 
-  function getResultsListDimensions() {
+  function getResultsListDimensions(node) {
     let maxHeightVar = getComputedStyle(document.documentElement).getPropertyValue("--svelte-helpers-auto-complete-results-max-height");
     let maxHeight = parseInt(maxHeightVar, 10);
 
-    let width = Math.max(resultsList.offsetWidth, inputEl.clientWidth);
-    let height = Math.min(resultsList.offsetHeight, maxHeight);
+    let width = Math.max(node.offsetWidth, inputEl.clientWidth);
+    let height = Math.min(node.offsetHeight, maxHeight);
 
     return { width, height };
   }
-
-  let itemsHeightObserver = new ResizeObserver(() => {
-    stateMachineService.send("RESIZE");
-  });
-
-  let inputWidthObserver = new ResizeObserver(() => {
-    inputWidth = inputEl.clientWidth;
-  });
-  let resultsList;
 
   function highlightItem(index) {
     index !== selectedIndex && (selectedIndex = index);
@@ -191,15 +212,7 @@
   });
 
   function resultsListRendered(node) {
-    resultsList = node;
-    stateMachineService.send({ type: "RENDERED", dimensions: getResultsListDimensions() });
-    itemsHeightObserver.observe(resultsList);
-    
-    return {
-      destroy() {
-        itemsHeightObserver.unobserve(resultsList);
-      }
-    };
+    stateMachineService.send({ type: "RENDERED", node });
   }
 </script>
 
