@@ -83,8 +83,8 @@
           opacitySpring.set(1);
           slideInSpring.set(getResultsListDimensions(context.node));
         },
-        closed: assign(() => {
-          itemsHeightObserver.unobserve(resultsList);
+        closed: assign(context => {
+          itemsHeightObserver.unobserve(context.node);
           return { open: false, node: null };
         })
       }
@@ -100,7 +100,10 @@
   });
 
   const stateMachineService = interpret(stateMachine).start();
-  $: ({ open, node: resultsList } = $stateMachineService.context);
+  let open, resultsList;
+
+  $: context = $stateMachineService.context;  
+  $: ({ open, node: resultsList } = context);
 
   let inputEl = null;
   let inputWidth;
