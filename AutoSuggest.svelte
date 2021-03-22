@@ -34,7 +34,7 @@
         },
         open: {
           on: {
-            RENDERED: { actions: "rendered" },
+            RENDERED: { actions: ["observeNodeSize", "setNodeState"] },
             RESIZE: { actions: "resize" },
             CLOSE: "closing"
           },
@@ -51,16 +51,15 @@
           on: {
             OPEN: "open"
           },
-          entry: "closed"
+          entry: ["stopObservingNode", "setClosedState"]
         }
       }
     },
     {
       actions: {
-        opened: assign(context => {
-          return { ...context, open: true };
-        }),
-        rendered: assign((context, evt) => {
+        opened: assign({ open: true }),
+        setNodeState: assign({ node: (ctx, evt) => evt.node }),
+        observeNodeSize(ctx, evt) {
           const { node } = evt;
           const dimensions = getResultsListDimensions(node);
           itemsHeightObserver.observe(node);
@@ -68,24 +67,25 @@
           Object.assign(slideInSpring, SLIDE_OPEN);
           slideInSpring.update(prev => ({ ...prev, width: dimensions.width }), { hard: true });
           slideInSpring.set(dimensions, { hard: false });
-          return { ...context, node };
-        }),
+        },
         close() {
           opacitySpring.set(0);
           Object.assign(slideInSpring, SLIDE_CLOSE);
           slideInSpring
             .update(prev => ({ ...prev, height: 0 }))
             .then(() => {
-              stateMachineService.send("CLOSED");
+              stateMachineService.send({ type: "CLOSED", node: stateMachineService.state.context.node });
             });
         },
         resize(context) {
           opacitySpring.set(1);
           slideInSpring.set(getResultsListDimensions(context.node));
         },
-        closed: assign(context => {
-          itemsHeightObserver.unobserve(context.node);
-          return { open: false, node: null };
+        stopObservingNode(ctx, evt) {
+          itemsHeightObserver.unobserve(evt.node);
+        },
+        setClosedState: assign(() => {
+          return { node: null, open: false };
         })
       }
     }
@@ -102,7 +102,7 @@
   const stateMachineService = interpret(stateMachine).start();
   let open, resultsList;
 
-  $: context = $stateMachineService.context;  
+  $: context = $stateMachineService.context;
   $: ({ open, node: resultsList } = context);
 
   let inputEl = null;
