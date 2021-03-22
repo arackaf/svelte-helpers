@@ -26,6 +26,7 @@
       initial: "initial",
       context: {
         open: false,
+        active: false,
         node: null
       },
       states: {
@@ -45,7 +46,7 @@
             OPEN: { target: "open", actions: ["resize"] },
             CLOSED: "closed"
           },
-          entry: "close"
+          entry: ["onClosing", "closeSpring"]
         },
         closed: {
           on: {
@@ -57,7 +58,7 @@
     },
     {
       actions: {
-        opened: assign({ open: true }),
+        opened: assign({ open: true, active: true }),
         setNodeState: assign({ node: (ctx, evt) => evt.node }),
         observeNodeSize(ctx, evt) {
           const { node } = evt;
@@ -68,7 +69,8 @@
           slideInSpring.update(prev => ({ ...prev, width: dimensions.width }), { hard: true });
           slideInSpring.set(dimensions, { hard: false });
         },
-        close() {
+        onClosing: assign({ active: false }),
+        closeSpring() {
           opacitySpring.set(0);
           Object.assign(slideInSpring, SLIDE_CLOSE);
           slideInSpring
@@ -103,7 +105,7 @@
   let open, resultsList;
 
   $: context = $stateMachineService.context;
-  $: ({ open, node: resultsList } = context);
+  $: ({ open, active, node: resultsList } = context);
 
   let inputEl = null;
   let inputWidth;
@@ -230,7 +232,7 @@
     on:click={inputEngaged}
     on:focus={inputEngaged}
     on:blur={inputBlurred}
-    class:open
+    class:open={active}
     style={inputStyles}
     {...inputProps}
   />
