@@ -14,7 +14,9 @@
     "url": "https://github.com/arackaf/svelte-helpers/issues"
   },
   "homepage": "https://github.com/arackaf/svelte-helpers#readme",
-  "devDependencies": {},
+  "devDependencies": {
+    "prettier-plugin-svelte": "^2.2.0"
+  },
   "dependencies": {
     "escape-string-regexp": "^4.0.0"
   }
