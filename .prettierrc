@@ -1,5 +1,7 @@
 {
+  "arrowParens": "avoid",
+  "svelteBracketNewLine": true,
   "printWidth": 150,
   "trailingComma": "none",
-  "arrowParens": "avoid"
+  "svelteSortOrder": "scripts-styles-markup"
 }

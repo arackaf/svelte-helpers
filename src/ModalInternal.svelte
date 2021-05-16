@@ -19,7 +19,7 @@
   // const DIMENSIONS_SPRING = { stiffness: 0.1, damping: 0.5, precision: 0.01 };
   const DIMENSIONS_SPRING = { stiffness: 0.2, damping: 0.6, precision: 0.01 };
 
-  const { tickToValue: modalSpringIn, duration: springInDuration } = springIn(-30, 0, OPEN_SPRING);
+  const { tickToValue: modalSpringIn, duration: springInDuration } = springIn(-15, 0, OPEN_SPRING);
   const { tickToValue: modalSpringOut, duration: springOutDuration } = springOut(0, 30, CLOSE_SPRING);
 
   let root;
@@ -66,7 +66,7 @@
     ro.observe(innerContent);
 
     onModalMount && onModalMount();
-    
+
     return () => {
       modalContentNode.removeEventListener("click", trap);
       ro.unobserve(innerContent);
