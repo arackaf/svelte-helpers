@@ -67,16 +67,15 @@
 <div class="root">
   <div>
     <h3>String options</h3>
-    <AutoSuggest filterField={'name'} displayField="name" placeholder="Search" options={options.map(item => item.name)}>
+    <AutoSuggest filterField={"name"} displayField="name" placeholder="Search" options={options.map(item => item.name)}>
       <div slot="result" let:option>{option}</div>
       <span slot="no-results">No Results :(</span>
     </AutoSuggest>
   </div>
 
-  <!--
   <div>
     <h3>Object options</h3>
-    <AutoSuggest filterField={'name'} displayField="name" placeholder="Search" {options}>
+    <AutoSuggest filterField={"name"} displayField="name" placeholder="Search" {options}>
       <div slot="result" let:option>{option.name}</div>
       <span slot="no-results">No Results :(</span>
     </AutoSuggest>
@@ -84,7 +83,7 @@
 
   <div>
     <h3>Search by string start</h3>
-    <AutoSuggest filterField={'name'} displayField="name" placeholder="Search" {options}>
+    <AutoSuggest filterField={"name"} displayField="name" placeholder="Search" {options}>
       <div slot="result" let:option>{option.name}</div>
       <span slot="no-results">No Results :(</span>
     </AutoSuggest>
@@ -114,6 +113,4 @@
     Selected:
     {selectedBook}
   </div>
-  -->
-  
 </div>
