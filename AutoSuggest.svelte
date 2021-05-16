@@ -1,9 +1,11 @@
+<svelte:options immutable={true} />
+
 <script>
   import { onMount } from "svelte";
   import { spring } from "svelte/motion";
-  import { fade } from "svelte/transition";
-  
+
   import escapeRegex from "escape-string-regexp";
+  import { createMachine, interpret, assign } from "@xstate/fsm";
 
   export let onItemSelected;
   export let onBlur;
@@ -16,26 +18,113 @@
   export let currentSearch = "";
   export let inputProps = {};
 
-  let open = false;
+  const SLIDE_OPEN = { stiffness: 0.2, damping: 0.7 };
+  const SLIDE_CLOSE = { stiffness: 0.3, damping: 0.7 };
+
+  const stateMachine = createMachine(
+    {
+      initial: "initial",
+      context: {
+        open: false,
+        active: false,
+        node: null
+      },
+      states: {
+        initial: {
+          on: { OPEN: "open" }
+        },
+        open: {
+          on: {
+            RENDERED: { actions: ["observeNodeSize", "setNodeState"] },
+            RESIZE: { actions: "resize" },
+            CLOSE: "closing"
+          },
+          entry: "opened"
+        },
+        closing: {
+          on: {
+            OPEN: { target: "open", actions: ["resize"] },
+            CLOSED: "closed"
+          },
+          entry: ["onClosing", "closeSpring"]
+        },
+        closed: {
+          on: {
+            OPEN: "open"
+          },
+          entry: ["stopObservingNode", "setClosedState"]
+        }
+      }
+    },
+    {
+      actions: {
+        opened: assign({ open: true, active: true }),
+        setNodeState: assign({ node: (ctx, evt) => evt.node }),
+        observeNodeSize(ctx, evt) {
+          const { node } = evt;
+          const dimensions = getResultsListDimensions(node);
+          itemsHeightObserver.observe(node);
+          opacitySpring.set(1, { hard: true });
+          Object.assign(slideInSpring, SLIDE_OPEN);
+          slideInSpring.update(prev => ({ ...prev, width: dimensions.width }), { hard: true });
+          slideInSpring.set(dimensions, { hard: false });
+        },
+        onClosing: assign({ active: false }),
+        closeSpring() {
+          opacitySpring.set(0);
+          Object.assign(slideInSpring, SLIDE_CLOSE);
+          slideInSpring
+            .update(prev => ({ ...prev, height: 0 }))
+            .then(() => {
+              stateMachineService.send({ type: "CLOSED", node: stateMachineService.state.context.node });
+            });
+        },
+        resize(context) {
+          opacitySpring.set(1);
+          slideInSpring.set(getResultsListDimensions(context.node));
+        },
+        stopObservingNode(ctx, evt) {
+          itemsHeightObserver.unobserve(evt.node);
+        },
+        setClosedState: assign(() => {
+          return { node: null, open: false };
+        })
+      }
+    }
+  );
+
+  let itemsHeightObserver = new ResizeObserver(() => {
+    stateMachineService.send("RESIZE");
+  });
+
+  let inputWidthObserver = new ResizeObserver(() => {
+    inputWidth = inputEl.clientWidth;
+  });
+
+  const stateMachineService = interpret(stateMachine).start();
+  let open, resultsList;
+
+  $: context = $stateMachineService.context;
+  $: ({ open, active, node: resultsList } = context);
+
   let inputEl = null;
   let inputWidth;
   let filteredOptions = options;
   let selectedIndex = null;
   let focused = false;
 
-  function inputEngaged() {
-    open = true;
+  function inputEngaged(evt) {
+    stateMachineService.send("OPEN");
+
     focused = true;
   }
 
   function inputChanged() {
-    if (!open) {
-      open = true;
-    }
+    stateMachineService.send("OPEN");
   }
 
   function inputBlurred() {
-    open = false;
+    stateMachineService.send("CLOSE");
     focused = false;
     onBlur && onBlur();
   }
@@ -59,37 +148,18 @@
     }
   }
 
-  let animateContainerHeight = false;
-  const slideInSpring = spring({ height: 0, width: 0 }, { stiffness: 0.2, damping: 0.7 });
+  const slideInSpring = spring({ height: 0, width: 0 });
+  const opacitySpring = spring(1, { stiffness: 0.3, damping: 0.7 });
 
-  function setSpringDimensions(hard) {
+  function getResultsListDimensions(node) {
     let maxHeightVar = getComputedStyle(document.documentElement).getPropertyValue("--svelte-helpers-auto-complete-results-max-height");
     let maxHeight = parseInt(maxHeightVar, 10);
 
-    slideInSpring.set(
-      { height: Math.min(resultsList.offsetHeight, maxHeight), width: Math.max(resultsList.offsetWidth, inputEl.clientWidth) },
-      hard ? { hard: true } : void 0
-    );
-  }
+    let width = Math.max(node.offsetWidth, inputEl.clientWidth);
+    let height = Math.min(node.offsetHeight, maxHeight);
 
-  let itemsHeightObserver = new ResizeObserver(() => setSpringDimensions());
-  let inputWidthObserver = new ResizeObserver(() => {
-    inputWidth = inputEl.clientWidth;
-  });
-  let resultsList;
-
-  function opening() {}
-  function opened() {
-    setSpringDimensions(true);
-
-    animateContainerHeight = true;
-    itemsHeightObserver.observe(resultsList);
+    return { width, height };
   }
-  function closing() {
-    itemsHeightObserver.unobserve(resultsList);
-    animateContainerHeight = false;
-  }
-  function closed() {}
 
   function highlightItem(index) {
     index !== selectedIndex && (selectedIndex = index);
@@ -108,14 +178,14 @@
     } else {
       inputEl.value = option[displayField];
     }
-    open = false;
+    stateMachineService.send("CLOSE");
   }
 
   function keyDown(evt) {
     if (evt.keyCode == 27 && open) {
-      open = false;
+      stateMachineService.send("CLOSE");
     } else if (!open && evt.keyCode == 40 && focused) {
-      open = true;
+      stateMachineService.send("OPEN");
     } else if (open && filteredOptions.length) {
       if (evt.keyCode == 40) {
         if (selectedIndex == null) {
@@ -132,7 +202,6 @@
       } else if (evt.keyCode == 13) {
         if (selectedIndex != null) {
           onSelect(filteredOptions[selectedIndex]);
-          open = false;
         }
       }
     }
@@ -146,7 +215,52 @@
       inputWidthObserver.unobserve(inputEl);
     };
   });
+
+  function resultsListRendered(node) {
+    stateMachineService.send({ type: "RENDERED", node });
+  }
 </script>
+
+<svelte:window on:keydown={keyDown} />
+
+<div class="root" class:open>
+  <input
+    {placeholder}
+    bind:this={inputEl}
+    bind:value={currentSearch}
+    on:input={inputChanged}
+    on:click={inputEngaged}
+    on:focus={inputEngaged}
+    on:blur={inputBlurred}
+    class:open={active}
+    style={inputStyles}
+    {...inputProps}
+  />
+  {#if open}
+    <div class="options-root">
+      <div style="height: {$slideInSpring.height + 'px'}; width: {$slideInSpring.width + 'px'}; opacity: {$opacitySpring}" class="options-container">
+        <ul use:resultsListRendered style="min-width: {inputWidth}px">
+          {#each filteredOptions as option, index}
+            <li
+              on:click={() => onSelect(option)}
+              on:mousemove={() => highlightItem(index)}
+              on:mouseleave={() => unhighlightItem(index)}
+              on:mousedown={evt => evt.preventDefault()}
+              class="result"
+              class:selected={index == selectedIndex}
+            >
+              <slot name="result" {option}>{typeof option === "string" ? option : option[displayField]}</slot>
+            </li>
+          {:else}
+            <li>
+              <slot name="no-results">No results</slot>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    </div>
+  {/if}
+</div>
 
 <style>
   :root {
@@ -167,7 +281,7 @@
 
   .root * {
     box-sizing: content-box;
-	}
+  }
 
   input {
     border: var(--svelte-helpers-auto-complete-border-width) solid var(--svelte-helpers-auto-complete-border-color);
@@ -218,50 +332,3 @@
     background-color: var(--svelte-helpers-auto-complete-option-hover-background);
   }
 </style>
-
-<svelte:window on:keydown={keyDown} />
-
-<div class="root" class:open>
-  <input
-    {placeholder}
-    bind:this={inputEl}
-    bind:value={currentSearch}
-    on:input={inputChanged}
-    on:click={inputEngaged}
-    on:focus={inputEngaged}
-    on:blur={inputBlurred}
-    class:open
-    style={inputStyles}
-    {...inputProps} />
-  {#if open}
-    <div
-      transition:fade={{ duration: 150 }}
-      class="options-root"
-      on:introstart={opening}
-      on:introend={opened}
-      on:outrostart={closing}
-      on:outroend={closed}>
-      <div
-        style="height: {animateContainerHeight ? $slideInSpring.height + 'px' : 'auto'}; width: {animateContainerHeight ? $slideInSpring.width + 'px' : 'auto'}"
-        class="options-container">
-        <ul bind:this={resultsList} style="min-width: {inputWidth}px">
-          {#each filteredOptions as option, index}
-            <li
-              on:click={() => onSelect(option)}
-              on:mousemove={() => highlightItem(index)}
-              on:mouseleave={() => unhighlightItem(index)}
-              on:mousedown={evt => evt.preventDefault()}
-              class="result"
-              class:selected={index == selectedIndex}>
-              <slot name="result" {option}>{typeof option === 'string' ? option : option[displayField]}</slot>
-            </li>
-          {:else}
-            <li>
-              <slot name="no-results">No results</slot>
-            </li>
-          {/each}
-        </ul>
-      </div>
-    </div>
-  {/if}
-</div>
