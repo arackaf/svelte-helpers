@@ -40,7 +40,14 @@
   </Modal>
 {/if}
 
-<Modal {open} bind:closeModal={closeModal1a} on:mount={() => el.focus()} on:close={() => (open = false)} on:closing={() => console.log('closing')} on:closed={() => console.log("closed")}>
+<Modal
+  {open}
+  bind:closeModal={closeModal1a}
+  on:mount={() => el.focus()}
+  on:close={() => (open = false)}
+  on:closing={() => console.log("closing")}
+  on:closed={() => console.log("closed")}
+>
   <input bind:this={el} />
   <ModalDemo1 />
   <hr />
@@ -57,8 +64,9 @@
     open={true}
     deferStateChangeOnClose={true}
     on:close={() => (open3 = false)}
-    on:closing={() => console.log('closing')}
-    useContentWidth={true}>
+    on:closing={() => console.log("closing")}
+    useContentWidth={true}
+  >
     <ModalDemo2 />
   </Modal>
 {/if}
@@ -70,25 +78,29 @@
     deferStateChangeOnClose={true}
     bind:closeModal={closeModal3a}
     on:close={() => (open3a = false)}
-    useContentWidth={true}>
+    useContentWidth={true}
+  >
     <ModalDemo2 />
     <hr />
     <button
       on:click={() => {
         counter++;
         closeModal3a();
-      }}>Close 2</button>
+      }}>Close 2</button
+    >
     <button
       on:click={() => {
         closeModal3a();
         counter++;
-      }}>Close 2a</button>
+      }}>Close 2a</button
+    >
     <button on:click={() => (open3a = false)}>Nuke</button>
     <button
       on:click={() => {
         closeModal3a();
         openSecond = true;
-      }}>Close then open</button>
+      }}>Close then open</button
+    >
   </Modal>
 {/if}
 

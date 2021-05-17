@@ -30,10 +30,10 @@
     dispatch("closing");
     unRenderModal(contentNode);
   };
-  
+
   let onClosed = () => {
     dispatch("closed");
-  }
+  };
   export const closeModal = () => {
     if (deferStateChangeOnClose) {
       blockModal(contentNode);

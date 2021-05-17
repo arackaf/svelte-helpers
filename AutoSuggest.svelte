@@ -221,47 +221,6 @@
   }
 </script>
 
-<svelte:window on:keydown={keyDown} />
-
-<div class="root" class:open>
-  <input
-    {placeholder}
-    bind:this={inputEl}
-    bind:value={currentSearch}
-    on:input={inputChanged}
-    on:click={inputEngaged}
-    on:focus={inputEngaged}
-    on:blur={inputBlurred}
-    class:open={active}
-    style={inputStyles}
-    {...inputProps}
-  />
-  {#if open}
-    <div class="options-root">
-      <div style="height: {$slideInSpring.height + 'px'}; width: {$slideInSpring.width + 'px'}; opacity: {$opacitySpring}" class="options-container">
-        <ul use:resultsListRendered style="min-width: {inputWidth}px">
-          {#each filteredOptions as option, index}
-            <li
-              on:click={() => onSelect(option)}
-              on:mousemove={() => highlightItem(index)}
-              on:mouseleave={() => unhighlightItem(index)}
-              on:mousedown={evt => evt.preventDefault()}
-              class="result"
-              class:selected={index == selectedIndex}
-            >
-              <slot name="result" {option}>{typeof option === "string" ? option : option[displayField]}</slot>
-            </li>
-          {:else}
-            <li>
-              <slot name="no-results">No results</slot>
-            </li>
-          {/each}
-        </ul>
-      </div>
-    </div>
-  {/if}
-</div>
-
 <style>
   :root {
     --svelte-helpers-auto-complete-border-color: lightgray;
@@ -332,3 +291,44 @@
     background-color: var(--svelte-helpers-auto-complete-option-hover-background);
   }
 </style>
+
+<svelte:window on:keydown={keyDown} />
+
+<div class="root" class:open>
+  <input
+    {placeholder}
+    bind:this={inputEl}
+    bind:value={currentSearch}
+    on:input={inputChanged}
+    on:click={inputEngaged}
+    on:focus={inputEngaged}
+    on:blur={inputBlurred}
+    class:open={active}
+    style={inputStyles}
+    {...inputProps}
+  />
+  {#if open}
+    <div class="options-root">
+      <div style="height: {$slideInSpring.height + 'px'}; width: {$slideInSpring.width + 'px'}; opacity: {$opacitySpring}" class="options-container">
+        <ul use:resultsListRendered style="min-width: {inputWidth}px">
+          {#each filteredOptions as option, index}
+            <li
+              on:click={() => onSelect(option)}
+              on:mousemove={() => highlightItem(index)}
+              on:mouseleave={() => unhighlightItem(index)}
+              on:mousedown={evt => evt.preventDefault()}
+              class="result"
+              class:selected={index == selectedIndex}
+            >
+              <slot name="result" {option}>{typeof option === "string" ? option : option[displayField]}</slot>
+            </li>
+          {:else}
+            <li>
+              <slot name="no-results">No results</slot>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    </div>
+  {/if}
+</div>

@@ -3,6 +3,5 @@
   import ModalDemo from "./ModalDemo.svelte";
 </script>
 
-
 <ModalDemo />
 <AutoSuggestDemo />
