@@ -17,6 +17,7 @@
   export let filterByStartsWith = false;
   export let currentSearch = "";
   export let inputProps = {};
+  export let searching = false;
 
   const SLIDE_OPEN = { stiffness: 0.2, damping: 0.7 };
   const SLIDE_CLOSE = { stiffness: 0.3, damping: 0.7 };
@@ -107,6 +108,8 @@
   $: context = $stateMachineService.context;
   $: ({ open, active, node: resultsList } = context);
 
+  $: console.log({ open });
+
   let inputEl = null;
   let inputWidth;
   let filteredOptions = options;
@@ -171,6 +174,7 @@
   }
 
   function onSelect(option) {
+    console.log("XXX");
     if (onItemSelected) {
       onItemSelected(option, inputEl);
     } else if (typeof option === "string") {
@@ -290,6 +294,10 @@
   :global(li.selected) {
     background-color: var(--svelte-helpers-auto-complete-option-hover-background);
   }
+
+  :global(li.searching) {
+    cursor: unset;
+  }
 </style>
 
 <svelte:window on:keydown={keyDown} />
@@ -311,6 +319,17 @@
     <div class="options-root">
       <div style="height: {$slideInSpring.height + 'px'}; width: {$slideInSpring.width + 'px'}; opacity: {$opacitySpring}" class="options-container">
         <ul use:resultsListRendered style="min-width: {inputWidth}px">
+          {#if searching}
+            <li
+              class="searching"
+              on:click={evt => {
+                evt.bubbles = false;
+                evt.cancelBubble = true;
+              }}
+            >
+              <slot name="searching">Searching...</slot>
+            </li>
+          {/if}
           {#each filteredOptions as option, index}
             <li
               on:click={() => onSelect(option)}

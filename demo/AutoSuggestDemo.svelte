@@ -113,4 +113,20 @@
     Selected:
     {selectedBook}
   </div>
+
+  <div>
+    <h3>Searching on always</h3>
+    <AutoSuggest filterField={"name"} displayField="name" placeholder="Search" options={options.map(item => item.name)} searching={true}>
+      <div slot="result" let:option>{option}</div>
+      <span slot="no-results">No Results :(</span>
+    </AutoSuggest>
+  </div>
+
+  <div>
+    <h3>Searching on always custom content</h3>
+    <AutoSuggest filterField={"name"} displayField="name" placeholder="Search" options={options.map(item => item.name)} searching={true}>
+      <div slot="result" let:option>{option}</div>
+      <span slot="no-results">No Results :(</span>
+    </AutoSuggest>
+  </div>
 </div>
