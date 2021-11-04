@@ -8,7 +8,7 @@
   import { createMachine, interpret, assign } from "@xstate/fsm";
 
   export let onItemSelected;
-  export let onBlur;
+  export let onBlur = () => {};
   export let options = [];
   export let placeholder = "";
   export let inputStyles = "";
