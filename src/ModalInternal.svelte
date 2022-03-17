@@ -112,7 +112,7 @@
   }
 </style>
 
-<div class="modal" in:modalIn out:modalOut on:outroend={onHidden} bind:this={root}>
+<div class="modal" in:modalIn out:modalOut style="will-change: transform" on:outroend={onHidden} bind:this={root}>
   <div bind:this={modalContentNode} class="svelte-helpers-modal-content" class:content-width={useContentWidth} style={dimensionStyles}>
     <div bind:this={innerContent} />
   </div>
