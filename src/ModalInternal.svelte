@@ -84,11 +84,9 @@
       duration: springInDuration,
       css: t => {
         const transformY = modalSpringIn(t);
-        const opacity = expoOut(t);
 
         return `
           transform: translate3d(0px, ${transformY}px, 0px);
-          opacity: ${opacity};
         `;
       }
     };
@@ -99,11 +97,9 @@
       duration: springOutDuration,
       css: t => {
         const easedTransform = modalSpringOut(t);
-        const easedOpacity = quintIn(t);
 
         return `
           transform: translate3d(0px, ${easedTransform}px, 0px);
-          opacity: ${easedOpacity}
         `;
       }
     };
