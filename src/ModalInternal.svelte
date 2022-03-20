@@ -14,8 +14,8 @@
 
   let modalContentNode;
 
-  const OPEN_SPRING = { stiffness: 0.1, damping: 0.3, precision: 0.01 };
-  const CLOSE_SPRING = { stiffness: 0.2, damping: 0.6, precision: 0.01 };
+  const OPEN_SPRING = { stiffness: 0.2, damping: 0.9, precision: 0.01 };
+  const CLOSE_SPRING = { stiffness: 0.2, damping: 0.9, precision: 0.01 };
   // const DIMENSIONS_SPRING = { stiffness: 0.1, damping: 0.5, precision: 0.01 };
   const DIMENSIONS_SPRING = { stiffness: 0.2, damping: 0.6, precision: 0.01 };
 
