@@ -30,6 +30,12 @@
   }
 </style>
 
-<div transition:fade={{ duration: 250, easing: quadOut }} class="svelte-modal-overlay" on:click={overLayClicked} on:mousedown={overlayMouseDown}>
+<div
+  transition:fade={{ duration: 200, easing: quadOut }}
+  style="will-change: opacity"
+  class="svelte-modal-overlay"
+  on:click={overLayClicked}
+  on:mousedown={overlayMouseDown}
+>
   <slot />
 </div>
