@@ -18,6 +18,12 @@
   export let currentSearch = "";
   export let inputProps = {};
 
+  const ResizeObserverStub = function () {};
+  ResizeObserverStub.prototype.observe = () => {};
+  ResizeObserverStub.prototype.unobserve = () => {};
+
+  const ResizeObserver = typeof window != "undefined" ? window.ResizeObserver : ResizeObserverStub;
+
   const SLIDE_OPEN = { stiffness: 0.2, damping: 0.7 };
   const SLIDE_CLOSE = { stiffness: 0.3, damping: 0.7 };
 
