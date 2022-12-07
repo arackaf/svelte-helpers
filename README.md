@@ -173,9 +173,11 @@ The modal has a global css class of `svelte-helpers-modal-content` applied. Add 
 | `inputStyles`        | `string`                       | The input's styles, if any |
 | `inputProps`        | `object`                       | Any props (attributes) you'd like to apply to the input |
 | `currentSearch`        | `string`                       | The currently searched for text. Bind to this if you'd like to control the input's value |
-| `onItemSelected`     | `(item, inputElement) => void`</span> | Optional callback to call when an item is selected. By default the input will fill its value with the selected item's `displayField` if it's an object, or the item itself if it's a string. If this callback is provided, it will be called and nothing else will happen. |
-| `onBlur`             | `() => void`                   | Optional callback to call when the input loses focus.  |
+| `onItemSelected`     | `(item, inputElement) => void`</span> | Optional callback to call when an item is selected. By default the input will fill its value with the selected item's `displayField` if it's an object, or the item itself if it's a string. If this callback is provided, it will be called and nothing else will happen. To cancel a selection, and prevent the options list from collapsing, return false from this call. |
+| `onBlur`             | `() => void`                   | Optional callback to call when the input loses focus  |
 | `filterField`        | `string`                       | If options are objects, this specifies the prop to filter by |
+| `noFiltering`        | `boolean`                       | If true, no filtering will happen. Filter your options however you'd like, and pass them in |
+| `keyField`        | `string`                       | If options are objects, this specifies the key prop for Svelte's #each block. Array index will be used if not provided. |
 | `displayField`       | `string`                       | If options are objects, this specifies the prop to display when selected |
 | `filterByStartsWith` | `boolean = false`              | If true the options will filter based on a match from the start of the option. Otherwise options will filter based on a match anywhere in the option's text |
 

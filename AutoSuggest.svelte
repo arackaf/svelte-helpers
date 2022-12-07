@@ -13,9 +13,11 @@
   export let placeholder = "";
   export let inputStyles = "";
   export let filterField = "";
+  export let keyField = "";
   export let displayField = "";
   export let filterByStartsWith = false;
   export let currentSearch = "";
+  export let noFiltering = false;
   export let inputProps = {};
 
   const ResizeObserverStub = function () {};
@@ -142,7 +144,11 @@
   }
 
   $: {
-    filteredOptions = currentSearch ? filterOptions(options) : options;
+    if (noFiltering) {
+      filteredOptions = options;
+    } else {
+      filteredOptions = currentSearch ? filterOptions(options) : options;
+    }
     selectedIndex = null;
   }
 
@@ -178,7 +184,9 @@
 
   function onSelect(option) {
     if (onItemSelected) {
-      onItemSelected(option, inputEl);
+      if (onItemSelected(option, inputEl) === false) {
+        return;
+      }
     } else if (typeof option === "string") {
       inputEl.value = option;
     } else {
@@ -206,6 +214,7 @@
           selectedIndex = selectedIndex == 0 ? filteredOptions.length - 1 : selectedIndex - 1;
         }
       } else if (evt.keyCode == 13) {
+        evt.preventDefault();
         if (selectedIndex != null) {
           onSelect(filteredOptions[selectedIndex]);
         }
@@ -317,7 +326,7 @@
     <div class="options-root">
       <div style="height: {$slideInSpring.height + 'px'}; width: {$slideInSpring.width + 'px'}; opacity: {$opacitySpring}" class="options-container">
         <ul use:resultsListRendered style="min-width: {inputWidth}px">
-          {#each filteredOptions as option, index}
+          {#each filteredOptions as option, index (option[keyField] || index)}
             <li
               on:click={() => onSelect(option)}
               on:mousemove={() => highlightItem(index)}
