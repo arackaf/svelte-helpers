@@ -183,10 +183,11 @@
   }
 
   function onSelect(option) {
+    if (typeof option === "object" && option.disabled) {
+      return;
+    }
     if (onItemSelected) {
-      if (onItemSelected(option, inputEl) === false) {
-        return;
-      }
+      onItemSelected(option, inputEl);
     } else if (typeof option === "string") {
       inputEl.value = option;
     } else {
@@ -246,6 +247,7 @@
     --svelte-helpers-auto-complete-option-hover-background: lightgray;
     --svelte-helpers-auto-complete-option-cursor: pointer;
     --svelte-helpers-auto-complete-options-background-color: white;
+    --svelte-helpers-auto-complete-disabled-option-cursor: not-allowed;
   }
 
   .root {
@@ -298,6 +300,10 @@
     margin: 0;
   }
 
+  li.disabled {
+    cursor: var(--svelte-helpers-auto-complete-disabled-option-cursor);
+  }
+
   :global(li.result) {
     cursor: var(--svelte-helpers-auto-complete-option-cursor);
   }
@@ -334,6 +340,7 @@
               on:mousedown={evt => evt.preventDefault()}
               class="result"
               class:selected={index == selectedIndex}
+              class:disabled={option.disabled}
             >
               <slot name="result" {option}>{typeof option === "string" ? option : option[displayField]}</slot>
             </li>

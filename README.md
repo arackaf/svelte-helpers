@@ -168,12 +168,12 @@ The modal has a global css class of `svelte-helpers-modal-content` applied. Add 
 
 | Prop                 | Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Description |
 | -------------------- | ------------------------------ | ------------|
-| `options`            | `[object]` or `[string]`       | The options to show |
+| `options`            | `[object]` or `[string]`       | The options to show. To disable an option, give it an `disabled` property set to true |
 | `placeholder`        | `string`                       | The input's placeholder |
 | `inputStyles`        | `string`                       | The input's styles, if any |
 | `inputProps`        | `object`                       | Any props (attributes) you'd like to apply to the input |
 | `currentSearch`        | `string`                       | The currently searched for text. Bind to this if you'd like to control the input's value |
-| `onItemSelected`     | `(item, inputElement) => void`</span> | Optional callback to call when an item is selected. By default the input will fill its value with the selected item's `displayField` if it's an object, or the item itself if it's a string. If this callback is provided, it will be called and nothing else will happen. To cancel a selection, and prevent the options list from collapsing, return false from this call. |
+| `onItemSelected`     | `(item, inputElement) => void`</span> | Optional callback to call when an item is selected. By default the input will fill its value with the selected item's `displayField` if it's an object, or the item itself if it's a string. If this callback is provided, it will be called and nothing else will happen.  |
 | `onBlur`             | `() => void`                   | Optional callback to call when the input loses focus  |
 | `filterField`        | `string`                       | If options are objects, this specifies the prop to filter by |
 | `noFiltering`        | `boolean`                       | If true, no filtering will happen. Filter your options however you'd like, and pass them in |
@@ -201,3 +201,4 @@ The following CSS variables can be overridden to customize this component's appe
 |`--svelte-helpers-auto-complete-option-hover-background` | Option background color when hovered |
 |`--svelte-helpers-auto-complete-option-cursor` | Cursor for options |
 |`--svelte-helpers-auto-complete-options-background-color` | Options container background color |
+|`--svelte-helpers-auto-complete-disabled-option-cursor` | Cursor for disabled options |
