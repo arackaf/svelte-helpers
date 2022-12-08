@@ -117,7 +117,7 @@
 
   let inputEl = null;
   let inputWidth;
-  let filteredOptions = options;
+  let filteredOptions = typeof options === "function" ? options() : options;
   let selectedIndex = null;
   let focused = false;
 
@@ -144,10 +144,14 @@
   }
 
   $: {
+    if (!open) {
+      filteredOptions = [];
+    }
+    const currentOptions = typeof options === "function" ? options() : options;
     if (noFiltering) {
-      filteredOptions = options;
+      filteredOptions = currentOptions;
     } else {
-      filteredOptions = currentSearch ? filterOptions(options) : options;
+      filteredOptions = currentSearch ? filterOptions(currentOptions) : currentOptions;
     }
     selectedIndex = null;
   }

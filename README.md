@@ -168,7 +168,7 @@ The modal has a global css class of `svelte-helpers-modal-content` applied. Add 
 
 | Prop                 | Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Description |
 | -------------------- | ------------------------------ | ------------|
-| `options`            | `[object]` or `[string]`       | The options to show. To disable an option, give it an `disabled` property set to true |
+| `options`            | `[object]` or `[string]` or a function return either of those | The options to show. To disable an option, give it a `disabled` property set to true. If you pass a function returning your options, the options will not change when the results list is open. This can be a handy way to prevent your options list from jumping the moment you select one, if such a selection changes which options can be selected.  |
 | `placeholder`        | `string`                       | The input's placeholder |
 | `inputStyles`        | `string`                       | The input's styles, if any |
 | `inputProps`        | `object`                       | Any props (attributes) you'd like to apply to the input |
