@@ -1,19 +1,7 @@
 <script>
   import AutoSuggest from "../AutoSuggest.svelte";
 
-  let options = [
-    { name: "Adam" },
-    { name: "Laura" },
-    { name: "Mark" },
-    { name: "Rob" },
-    { name: "Jen" },
-    { name: "James" },
-    { name: "Jason" },
-    { name: "Kevin" },
-    { name: "Katie" },
-    { name: "Mallory" },
-    { name: "David" }
-  ];
+  let options = [{ name: "Adam" }, { name: "Laura" }, { name: "Mark" }];
 
   let books = [];
 

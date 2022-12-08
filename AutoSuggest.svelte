@@ -2,7 +2,7 @@
 
 <script>
   import { onMount } from "svelte";
-  import { spring } from "svelte/motion";
+  import { spring, tweened } from "svelte/motion";
 
   import escapeRegex from "escape-string-regexp";
   import { createMachine, interpret, assign } from "@xstate/fsm";
@@ -27,7 +27,8 @@
   const ResizeObserver = typeof window != "undefined" ? window.ResizeObserver : ResizeObserverStub;
 
   const SLIDE_OPEN = { stiffness: 0.2, damping: 0.7 };
-  const SLIDE_CLOSE = { stiffness: 0.3, damping: 0.7 };
+  const SLIDE_CLOSE = { stiffness: 0.6, damping: 0.9 };
+  // const SLIDE_CLOSE = { stiffness: 0.3, damping: 0.7 };
 
   const stateMachine = createMachine(
     {
@@ -73,16 +74,24 @@
           const dimensions = getResultsListDimensions(node);
           itemsHeightObserver.observe(node);
           opacitySpring.set(1, { hard: true });
-          Object.assign(slideInSpring, SLIDE_OPEN);
-          slideInSpring.update(prev => ({ ...prev, width: dimensions.width }), { hard: true });
+          //Object.assign(slideInSpring, SLIDE_OPEN);
+          slideInSpring.update(prev => ({ ...prev, width: dimensions.width }), { duration: 0 });
           slideInSpring.set(dimensions, { hard: false });
         },
         onClosing: assign({ active: false }),
         closeSpring() {
-          opacitySpring.set(0);
-          Object.assign(slideInSpring, SLIDE_CLOSE);
+          console.log("CLOSING");
+          //opacitySpring.set(0);
+          //Object.assign(slideInSpring, SLIDE_CLOSE);
+
           slideInSpring
-            .update(prev => ({ ...prev, height: 0 }))
+            .update(
+              prev => {
+                console.log("PREV", prev);
+                return { ...prev, height: 0 };
+              },
+              { duration: 100 }
+            )
             .then(() => {
               stateMachineService.send({ type: "CLOSED", node: stateMachineService.state.context.node });
             });
@@ -100,6 +109,8 @@
       }
     }
   );
+
+  $: console.log({ springSlide: $slideInSpring });
 
   let itemsHeightObserver = new ResizeObserver(() => {
     stateMachineService.send("RESIZE");
@@ -164,7 +175,8 @@
     }
   }
 
-  const slideInSpring = spring({ height: 0, width: 0 });
+  // const slideInSpring = spring({ height: 0, width: 0 });
+  const slideInSpring = tweened({ height: 0, width: 0 }, { duration: 500 });
   const opacitySpring = spring(1, { stiffness: 0.3, damping: 0.7 });
 
   function getResultsListDimensions(node) {
