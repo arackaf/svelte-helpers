@@ -4,7 +4,7 @@
   let options = [
     { name: "Adam" },
     { name: "Laura" },
-    { name: "Mark" },
+    { name: "Mark", disabled: true },
     { name: "Rob" },
     { name: "Jen" },
     { name: "James" },

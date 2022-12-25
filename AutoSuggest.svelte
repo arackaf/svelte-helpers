@@ -249,6 +249,7 @@
     --svelte-helpers-auto-complete-option-padding: 5px;
     --svelte-helpers-auto-complete-results-max-height: 300px;
     --svelte-helpers-auto-complete-option-hover-background: lightgray;
+    --svelte-helpers-auto-complete-disabled-option-hover-background: unset;
     --svelte-helpers-auto-complete-option-cursor: pointer;
     --svelte-helpers-auto-complete-options-background-color: white;
     --svelte-helpers-auto-complete-disabled-option-cursor: not-allowed;
@@ -304,15 +305,16 @@
     margin: 0;
   }
 
-  li.disabled {
-    cursor: var(--svelte-helpers-auto-complete-disabled-option-cursor);
-  }
-
-  :global(li.result) {
+  li.result {
     cursor: var(--svelte-helpers-auto-complete-option-cursor);
   }
 
-  :global(li.selected) {
+  li.result.disabled {
+    cursor: var(--svelte-helpers-auto-complete-disabled-option-cursor);
+    background-color: var(--svelte-helpers-auto-complete-disabled-option-hover-background);
+  }
+
+  li.selected {
     background-color: var(--svelte-helpers-auto-complete-option-hover-background);
   }
 </style>
@@ -342,6 +344,7 @@
               on:mousemove={() => highlightItem(index)}
               on:mouseleave={() => unhighlightItem(index)}
               on:mousedown={evt => evt.preventDefault()}
+              on:keypress={() => {}}
               class="result"
               class:selected={index == selectedIndex}
               class:disabled={option.disabled}
