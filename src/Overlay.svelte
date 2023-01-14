@@ -36,6 +36,7 @@
   class="svelte-modal-overlay"
   on:click={overLayClicked}
   on:mousedown={overlayMouseDown}
+  on:keydown={() => {}}
 >
   <slot />
 </div>
