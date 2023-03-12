@@ -20,7 +20,14 @@
 <svelte:window on:keydown={keyDown} />
 
 {#each $modalState.modals as { modalKey, ...packet } (packet.node)}
-  <Overlay onClose={packet.onClose} modalNode={packet.node}>
-    <ModalInternal {...packet} />
+  <Overlay onClose={packet.onClose}>
+    <ModalInternal
+      node={packet.node}
+      useContentWidth={packet.useContentWidth}
+      isAnimatingResizing={packet.isAnimatingResizing}
+      onHide={packet.onHide}
+      onClosed={packet.onClosed}
+      onModalMount={packet.onModalMount}
+    />
   </Overlay>
 {/each}

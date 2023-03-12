@@ -1,7 +1,6 @@
 <script>
   import { onMount } from "svelte";
   import { spring } from "svelte/motion";
-  import { expoOut, quintIn, quadOut } from "svelte/easing";
 
   import { springIn, springOut } from "../spring-transitions";
 
