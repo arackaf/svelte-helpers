@@ -1,6 +1,6 @@
 {
   "name": "svelte-helpers",
-  "version": "0.2.24",
+  "version": "0.2.26",
   "description": "",
   "main": "index.js",
   "scripts": {
