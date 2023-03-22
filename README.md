@@ -94,8 +94,8 @@ The modal and overlay will both animate in and out. These animations are not (ye
 
 ### Events
 
-| Name                 | Purpose |
-| -------------------- | ------------------------------ | ------------|
+| Name                 | Purpose | 
+| -------------------- | ------------------------------ |
 | `on:close`            | The modal has been closed. Use this method to set whatever state to reflect this closed state |
 | `on:closing`            | The modal's closing animation has started. |
 | `on:closed`            | The modal's closing animation has completed. |
@@ -166,7 +166,7 @@ The modal has a global css class of `svelte-helpers-modal-content` applied. Add 
 
 ### Props
 
-| Prop                 | Type&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Description |
+| Prop                 | Type  | Description |
 | -------------------- | ------------------------------ | ------------|
 | `options`            | `[object]` or `[string]` or a function return either of those | The options to show. To disable an option, give it a `disabled` property set to true. If you pass a function returning your options, the options will not change when the results list is open. This can be a handy way to prevent your options list from jumping the moment you select one, if such a selection changes which options can be selected.  |
 | `placeholder`        | `string`                       | The input's placeholder |
